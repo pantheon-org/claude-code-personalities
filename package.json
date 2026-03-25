@@ -7,11 +7,11 @@
     "build": "bun run scripts/build.ts",
     "dev:hook": "bun run src/hooks/inject.ts",
     "dev:cli": "bun run src/cli/switch.ts",
-    "install:plugin": "node install.mjs",
+    "install:plugin": "node dist/install.mjs",
     "typecheck": "tsc --noEmit",
-    "lint": "biome check src/ install.mjs",
-    "lint:fix": "biome check --write src/ install.mjs",
-    "format": "biome format --write src/ install.mjs"
+    "lint": "biome check src/",
+    "lint:fix": "biome check --write src/",
+    "format": "biome format --write src/"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.8",

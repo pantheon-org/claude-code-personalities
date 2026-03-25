@@ -97,38 +97,16 @@ Here is a fully annotated example (`marvin.json`):
 
 ## Installation
 
-### As a Claude Code plugin (recommended)
-
-```bash
-git clone https://github.com/pantheon-org/claude-code-personalities
-node install.mjs
-```
-
-Then load the plugin:
-
-```bash
-claude --plugin-dir ./claude-code-personalities
-```
-
-The skill is available as `/pantheon-ai:personality`.
-
-### Standalone install (legacy)
-
 ```bash
 git clone https://github.com/pantheon-org/claude-code-personalities
 cd claude-code-personalities
 bun install
 bun run build
-node install.mjs
+bun run install:plugin
+claude --plugin-dir .
 ```
 
-`install.mjs` does the following:
-
-1. Creates `~/.config/claude/personalities/data/` if it doesn't exist
-2. Deploys the compiled hook and CLI to `~/.config/claude/personalities/`
-3. Adds the `UserPromptSubmit` hook to `~/.config/claude/settings.json`
-4. Symlinks `skills/personality/` into `~/.config/claude/skills/`
-5. Seeds `data/*.json` into the personalities directory if it's empty
+`bun run install:plugin` seeds the bundled example personalities into `~/.config/claude/personalities/data/` if none exist yet. The plugin handles hook registration and skill loading automatically via `hooks/hooks.json` and `skills/`.
 
 ## Personality schema
 

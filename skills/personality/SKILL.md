@@ -14,7 +14,7 @@ The user has invoked `/personality` with arguments: `$ARGUMENTS`
 Run the following command and show the output to the user:
 
 ```bash
-node "$HOME/.config/claude/personalities/switch.mjs" $ARGUMENTS
+node "${CLAUDE_PLUGIN_ROOT}/dist/cli/switch.mjs" $ARGUMENTS
 ```
 
 If a personality name was provided and the switch was successful, let the user know the new personality is active from their next message onward.

@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$HOME/.config/claude/personalities/inject.mjs\""
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/dist/hooks/inject.mjs\""
           }
         ]
       }
