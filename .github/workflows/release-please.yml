@@ -1,0 +1,31 @@
+# Release Please
+#
+# Manages automated releases on merge to main.
+# - Opens/updates a Release PR that bumps package.json version and generates CHANGELOG.md
+# - When the Release PR is merged, creates a GitHub Release with a git tag
+#
+# Required permissions (GITHUB_TOKEN): contents: write, pull-requests: write
+
+name: Release Please
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-please
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: googleapis/release-please-action@7987652d64b4581673a76e33ad5e98e3dd56832f # v4.1.3
+        with:
+          release-type: node
