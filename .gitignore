@@ -4,3 +4,6 @@ bun.lock
 dist/
 .env
 .env.keys
+skills-lock.json
+.claude/skills/
+.agents/
