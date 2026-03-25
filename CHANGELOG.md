@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/pantheon-org/claude-code-personalities/compare/v1.0.1...v1.0.2) (2026-03-25)
+
+
+### Bug Fixes
+
+* address plugin structural issues ([#12](https://github.com/pantheon-org/claude-code-personalities/issues/12)) ([ee6c8bc](https://github.com/pantheon-org/claude-code-personalities/commit/ee6c8bc065cf48f372565387873d2a964c8a43e4))
+
 ## [1.0.1](https://github.com/pantheon-org/claude-code-personalities/compare/v1.0.0...v1.0.1) (2026-03-25)
 
 
