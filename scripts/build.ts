@@ -43,7 +43,6 @@ await build({
 	...shared,
 	build: {
 		...shared.build,
-		minify: false as const,
 		lib: {
 			entry: "src/install.ts",
 			fileName: () => "install.mjs",
