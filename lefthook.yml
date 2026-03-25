@@ -6,8 +6,6 @@ pre-commit:
     lint:
       run: bun run lint:fix
       stage_fixed: true
-    build:
-      run: bun run build
     markdown:
       run: bunx markdownlint-cli2 "**/*.md"
       stage_fixed: true

@@ -159,7 +159,7 @@ bun run install:plugin  # seed personality data + skill symlink (first run only)
 
 Source lives in `src/`, compiled output goes to `dist/` (gitignored locally; committed to `main` by the `bundle.yml` CI workflow).
 
-Pre-commit hooks (via lefthook) run `typecheck`, `lint --write`, and `build` automatically.
+Pre-commit hooks (via lefthook) run `typecheck` and `lint --write` automatically. `dist/` is built exclusively by CI.
 
 ## Distribution
 
