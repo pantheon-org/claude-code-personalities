@@ -138,6 +138,6 @@ bun run lint:fix     # biome check --write (auto-fix)
 node install.mjs     # redeploy after a build
 ```
 
-Source lives in `src/`. The compiled output in `dist/` is committed and ships with the plugin — no build step required for end users who install from a release tag.
+Source lives in `src/`, compiled output goes to `dist/` (gitignored).
 
 Pre-commit hooks (via lefthook) run `typecheck`, `lint --write`, and `build` automatically.

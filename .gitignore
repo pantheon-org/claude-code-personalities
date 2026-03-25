@@ -1,4 +1,4 @@
 node_modules/
 bun.lock
 *.local
-# dist/ is intentionally tracked — compiled output ships with the plugin
+dist/
