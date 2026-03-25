@@ -7,14 +7,14 @@
  * via hooks/hooks.json using ${CLAUDE_PLUGIN_ROOT} — no hardcoded paths needed.
  */
 import { copyFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
-import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { CLAUDE_CODE_CONFIG_DIR } from "./contants.js";
 
 const PLUGIN_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DATA_DIR =
 	process.env.CLAUDE_PLUGIN_DATA_DIR ??
-	join(homedir(), ".config/claude/personalities/data");
+	join(CLAUDE_CODE_CONFIG_DIR, "personalities/data");
 
 // 1. Seed personality data
 mkdirSync(DATA_DIR, { recursive: true });
