@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/pantheon-org/claude-code-personalities/main/schema/personality.schema.json",
+  "title": "PersonalityConfig",
+  "description": "Defines a Claude Code personality injected via UserPromptSubmit hook.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name shown in /personality listings."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Full character description injected verbatim into the system prompt."
+    },
+    "emoji": {
+      "type": "string",
+      "description": "A single emoji character used naturally in responses."
+    },
+    "slangIntensity": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "0 = no slang, 1 = heavy character-specific slang."
+    },
+    "moods": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "hint": { "type": "string", "minLength": 1 },
+          "score": { "type": "number" }
+        },
+        "required": ["name", "hint", "score"],
+        "additionalProperties": false
+      }
+    },
+    "mood": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether the mood system affects tone."
+        },
+        "default": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Name of the active mood."
+        },
+        "override": {
+          "anyOf": [{ "type": "string" }, { "type": "null" }],
+          "description": "Force a specific mood regardless of drift. null = use default."
+        },
+        "drift": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "How much the mood drifts between responses (reserved for future use)."
+        }
+      },
+      "required": ["enabled", "default"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["description"],
+  "additionalProperties": false
+}

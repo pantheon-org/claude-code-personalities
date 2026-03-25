@@ -1,26 +1,32 @@
 import { z } from "zod";
 
-export const MoodSchema = z.object({
-	name: z.string(),
-	hint: z.string(),
-	score: z.number(),
-});
+export const MoodSchema = z
+	.object({
+		name: z.string().min(1),
+		hint: z.string().min(1),
+		score: z.number(),
+	})
+	.strict();
 
-export const PersonalityConfigSchema = z.object({
-	name: z.string().optional(),
-	description: z.string().optional(),
-	emoji: z.string().optional(),
-	slangIntensity: z.number().min(0).max(1).optional(),
-	moods: z.array(MoodSchema).optional(),
-	mood: z
-		.object({
-			enabled: z.boolean().optional(),
-			default: z.string().optional(),
-			override: z.string().nullable().optional(),
-			drift: z.number().optional(),
-		})
-		.optional(),
-});
+export const PersonalityConfigSchema = z
+	.object({
+		$schema: z.string().optional(),
+		name: z.string().optional(),
+		description: z.string().min(1),
+		emoji: z.string().optional(),
+		slangIntensity: z.number().min(0).max(1).optional(),
+		moods: z.array(MoodSchema).optional(),
+		mood: z
+			.object({
+				enabled: z.boolean(),
+				default: z.string().min(1),
+				override: z.string().nullable().optional(),
+				drift: z.number().min(0).max(1).optional(),
+			})
+			.strict()
+			.optional(),
+	})
+	.strict();
 
 export const PersonalityStateSchema = z.object({
 	current: z.string(),
