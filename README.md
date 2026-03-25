@@ -146,7 +146,7 @@ bun run lint:fix        # biome check --write (auto-fix)
 bun run install:plugin  # seed personality data + skill symlink (first run only)
 ```
 
-Source lives in `src/`, compiled output goes to `dist/` (committed).
+Source lives in `src/`, compiled output goes to `dist/` (gitignored locally; committed to `main` by the `bundle.yml` CI workflow).
 
 Pre-commit hooks (via lefthook) run `typecheck`, `lint --write`, and `build` automatically.
 
@@ -155,6 +155,6 @@ Pre-commit hooks (via lefthook) run `typecheck`, `lint --write`, and `build` aut
 The plugin is ready for publication to the Claude Code Plugin marketplace. All distribution requirements have been implemented:
 
 - **`.claude-plugin/plugin.json`** — plugin manifest (name, version, description) ✓
-- **`dist/` committed** — compiled output is in version control; no build step required on install ✓
+- **`dist/` built by CI** — a `bundle.yml` workflow builds and commits `dist/` to `main` on every source change; no manual build step required on install ✓
 - **Hooks via `hooks/hooks.json`** — `SessionStart` hook registers automatically using `${CLAUDE_PLUGIN_ROOT}`; no `settings.json` mutation ✓
 - **`CLAUDE_PLUGIN_DATA_DIR`** — personality data path reads from the Plugin-provided env var, falling back to `~/.config/claude/personalities/data` for local dev ✓
