@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/pantheon-org/claude-code-personalities/compare/v1.0.0...v1.0.1) (2026-03-25)
+
+
+### Bug Fixes
+
+* add marketplace.json for claude plugin marketplace ([#9](https://github.com/pantheon-org/claude-code-personalities/issues/9)) ([afd0645](https://github.com/pantheon-org/claude-code-personalities/commit/afd0645302f4f907f6074d8120470c2029303402))
+* **ci:** trigger bundle on .claude-plugin/** changes ([#11](https://github.com/pantheon-org/claude-code-personalities/issues/11)) ([dbd7223](https://github.com/pantheon-org/claude-code-personalities/commit/dbd72234e555a2a22f3d602870f6d9d56c82044c))
+
 ## 1.0.0 (2026-03-25)
 
 
