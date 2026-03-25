@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "bun run scripts/build.ts",
+    "generate:schema": "bun run scripts/generate-schema.ts",
     "dev:hook": "bun run src/hooks/inject.ts",
     "dev:cli": "bun run src/cli/switch.ts",
     "install:plugin": "node dist/install.mjs",

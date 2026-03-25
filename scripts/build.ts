@@ -1,4 +1,7 @@
 import { build } from "vite";
+import { execSync } from "node:child_process";
+
+execSync("bun run scripts/generate-schema.ts", { stdio: "inherit" });
 
 const shared = {
 	build: {

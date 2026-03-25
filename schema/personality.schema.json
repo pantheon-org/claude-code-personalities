@@ -9,34 +9,42 @@
       "type": "string"
     },
     "name": {
-      "type": "string",
-      "description": "Display name shown in /personality listings."
+      "type": "string"
     },
     "description": {
       "type": "string",
-      "minLength": 1,
-      "description": "Full character description injected verbatim into the system prompt."
+      "minLength": 1
     },
     "emoji": {
-      "type": "string",
-      "description": "A single emoji character used naturally in responses."
+      "type": "string"
     },
     "slangIntensity": {
       "type": "number",
       "minimum": 0,
-      "maximum": 1,
-      "description": "0 = no slang, 1 = heavy character-specific slang."
+      "maximum": 1
     },
     "moods": {
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
-          "name": { "type": "string", "minLength": 1 },
-          "hint": { "type": "string", "minLength": 1 },
-          "score": { "type": "number" }
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "hint": {
+            "type": "string",
+            "minLength": 1
+          },
+          "score": {
+            "type": "number"
+          }
         },
-        "required": ["name", "hint", "score"],
+        "required": [
+          "name",
+          "hint",
+          "score"
+        ],
         "additionalProperties": false
       }
     },
@@ -44,29 +52,37 @@
       "type": "object",
       "properties": {
         "enabled": {
-          "type": "boolean",
-          "description": "Whether the mood system affects tone."
+          "type": "boolean"
         },
         "default": {
           "type": "string",
-          "minLength": 1,
-          "description": "Name of the active mood."
+          "minLength": 1
         },
         "override": {
-          "anyOf": [{ "type": "string" }, { "type": "null" }],
-          "description": "Force a specific mood regardless of drift. null = use default."
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "drift": {
           "type": "number",
           "minimum": 0,
-          "maximum": 1,
-          "description": "How much the mood drifts between responses (reserved for future use)."
+          "maximum": 1
         }
       },
-      "required": ["enabled", "default"],
+      "required": [
+        "enabled",
+        "default"
+      ],
       "additionalProperties": false
     }
   },
-  "required": ["description"],
+  "required": [
+    "description"
+  ],
   "additionalProperties": false
 }
