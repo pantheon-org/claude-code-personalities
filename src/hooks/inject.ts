@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * UserPromptSubmit hook — injects the active personality as a system message.
- * Output: { "systemMessage": "<prompt>" }
+ * SessionStart hook — injects the active personality once at session open.
+ * Output: { "additionalContext": "<prompt>" }
  * If no personalities are installed, exits silently with no output.
  */
 import {
@@ -29,4 +29,4 @@ if (!state || !available.includes(state.current)) {
 }
 
 const config = await loadPersonality(state.current);
-console.log(JSON.stringify({ systemMessage: buildPrompt(config) }));
+console.log(JSON.stringify({ additionalContext: buildPrompt(config) }));
