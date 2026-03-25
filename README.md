@@ -97,6 +97,23 @@ Here is a fully annotated example (`marvin.json`):
 
 ## Installation
 
+### As a Claude Code plugin (recommended)
+
+```bash
+git clone https://github.com/pantheon-org/claude-code-personalities
+node install.mjs
+```
+
+Then load the plugin:
+
+```bash
+claude --plugin-dir ./claude-code-personalities
+```
+
+The skill is available as `/pantheon-ai:personality`.
+
+### Standalone install (legacy)
+
 ```bash
 git clone https://github.com/pantheon-org/claude-code-personalities
 cd claude-code-personalities

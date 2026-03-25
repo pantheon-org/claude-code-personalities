@@ -1,0 +1,9 @@
+{
+  "name": "pantheon-ai",
+  "description": "Inject a character personality into every conversation via a UserPromptSubmit hook. Switch personalities at any time with /pantheon-ai:personality.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Pantheon AI"
+  },
+  "repository": "https://github.com/pantheon-org/claude-code-personalities"
+}

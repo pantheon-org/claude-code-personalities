@@ -3,7 +3,12 @@
     "UserPromptSubmit": [
       {
         "matcher": "",
-        "command": "node \"$HOME/.config/claude/personalities/inject.mjs\""
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.config/claude/personalities/inject.mjs\""
+          }
+        ]
       }
     ]
   }
