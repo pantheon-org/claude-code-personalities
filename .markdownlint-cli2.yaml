@@ -1,5 +1,6 @@
 ignores:
   - node_modules/**
+  - CHANGELOG.md
 
 config:
   MD013: false  # line length — too prescriptive for prose

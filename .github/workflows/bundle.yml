@@ -11,13 +11,23 @@ on:
       - 'vite.config*'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   bundle:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
+      - uses: actions/create-github-app-token@v1
+        id: token
+        with:
+          app-id: ${{ vars.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.token.outputs.token }}
 
       - uses: oven-sh/setup-bun@v2
         with:
@@ -31,8 +41,8 @@ jobs:
 
       - name: Commit dist
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "pantheon-org-bot[bot]"
+          git config user.email "pantheon-org-bot[bot]@users.noreply.github.com"
           git add -f dist/hooks/inject.mjs dist/cli/switch.mjs dist/install.mjs
           git diff --staged --quiet && echo "No changes" && exit 0
           git commit -m "ci: update dist bundles"
