@@ -2,3 +2,5 @@ node_modules/
 bun.lock
 *.local
 dist/
+.env
+.env.keys
