@@ -1,6 +1,6 @@
 # claude-code-personalities
 
-A Claude Code plugin that injects a character personality into every conversation via a `UserPromptSubmit` hook. Switch personalities at any time with `/personality`.
+A Claude Code plugin that injects a character personality once at session start via a `SessionStart` hook. Switch personalities at any time with `/pantheon-ai:personality`.
 
 ## Included personalities
 
@@ -29,7 +29,7 @@ A Claude Code plugin that injects a character personality into every conversatio
 /personality spock    — switch to Spock
 ```
 
-The active personality persists across sessions. The next message you send after switching will be in the new personality.
+The active personality persists across sessions. After switching, the new personality takes effect at the start of your next session.
 
 ### Add your own
 
@@ -130,7 +130,7 @@ bun run build        # compile TypeScript → dist/ via Vite
 bun run typecheck    # type-check without emitting
 bun run lint         # biome check
 bun run lint:fix     # biome check --write (auto-fix)
-node install.mjs     # redeploy after a build
+bun run install:plugin  # seed personality data (first run only)
 ```
 
 Source lives in `src/`, compiled output goes to `dist/` (gitignored).
