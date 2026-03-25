@@ -1,6 +1,6 @@
 # claude-code-personalities
 
-A Claude Code plugin that injects a character personality once at session start via a `SessionStart` hook. Switch personalities at any time with `/pantheon-ai:personality`.
+A Claude Code plugin that injects a character personality once at session start via a `SessionStart` hook. Switch personalities at any time with `/claude-code-personalities:personality`.
 
 ## Included personalities
 

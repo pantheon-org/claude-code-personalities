@@ -1,6 +1,6 @@
 ---
 name: personality
-description: Switch the active Claude personality, or list available ones. Trigger when the user invokes /pantheon-ai:personality or /personality.
+description: Switch the active Claude personality, or list available ones. Trigger when the user invokes /claude-code-personalities:personality or /personality.
 ---
 
 # Personality Switcher
