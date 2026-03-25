@@ -1,6 +1,6 @@
 {
   "name": "claude-code-personalities",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Claude Code plugin — inject personality prompts into every conversation",
   "type": "module",
   "scripts": {

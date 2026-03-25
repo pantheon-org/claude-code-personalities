@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/pantheon-org/claude-code-personalities/compare/v1.0.2...v1.0.3) (2026-03-25)
+
+
+### Bug Fixes
+
+* register skills directory and minify all dist outputs ([#14](https://github.com/pantheon-org/claude-code-personalities/issues/14)) ([e7d6f97](https://github.com/pantheon-org/claude-code-personalities/commit/e7d6f97c35d2494d0ddde3eaa766fa1a6e718328))
+
 ## [1.0.2](https://github.com/pantheon-org/claude-code-personalities/compare/v1.0.1...v1.0.2) (2026-03-25)
 
 
