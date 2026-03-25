@@ -3,8 +3,7 @@
 # Manages automated releases on merge to main.
 # - Opens/updates a Release PR that bumps package.json version and generates CHANGELOG.md
 # - When the Release PR is merged, creates a GitHub Release with a git tag
-#
-# Required permissions (GITHUB_TOKEN): contents: write, pull-requests: write
+# - On release creation, builds and uploads dist/ as release assets
 
 name: Release Please
 
@@ -25,6 +24,10 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      upload_url: ${{ steps.release.outputs.upload_url }}
     steps:
       - uses: actions/create-github-app-token@v1
         id: token
@@ -43,3 +46,38 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.token.outputs.token }}
         run: gh pr merge --auto --squash "${{ steps.release.outputs.pr }}" --repo ${{ github.repository }}
+
+  build-and-upload:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/create-github-app-token@v1
+        id: token
+        with:
+          app-id: ${{ vars.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release-please.outputs.tag_name }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install
+
+      - run: bun run build
+
+      - name: Upload dist as release assets
+        env:
+          GH_TOKEN: ${{ steps.token.outputs.token }}
+        run: |
+          gh release upload "${{ needs.release-please.outputs.tag_name }}" \
+            dist/hooks/inject.mjs \
+            dist/cli/switch.mjs \
+            dist/install.mjs \
+            --repo ${{ github.repository }}
