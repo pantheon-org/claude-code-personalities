@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "command": "node \"$HOME/.config/claude/personalities/inject.mjs\""
+      }
+    ]
+  }
+}

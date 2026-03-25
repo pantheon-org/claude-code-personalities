@@ -1,0 +1,10 @@
+pre-commit:
+  parallel: true
+  commands:
+    typecheck:
+      run: bun run typecheck
+    lint:
+      run: bun run lint:fix
+      stage_fixed: true
+    build:
+      run: bun run build

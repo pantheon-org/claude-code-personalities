@@ -1,0 +1,26 @@
+{
+  "name": "claude-code-personalities",
+  "version": "1.0.0",
+  "description": "Claude Code plugin — inject personality prompts into every conversation",
+  "type": "module",
+  "scripts": {
+    "build": "bun run scripts/build.ts",
+    "dev:hook": "bun run src/hooks/inject.ts",
+    "dev:cli": "bun run src/cli/switch.ts",
+    "install:plugin": "node install.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check src/ install.mjs",
+    "lint:fix": "biome check --write src/ install.mjs",
+    "format": "biome format --write src/ install.mjs"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.8",
+    "bun-types": "latest",
+    "lefthook": "^2.1.4",
+    "typescript": "^5.0.0",
+    "vite": "^8.0.2"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  }
+}
