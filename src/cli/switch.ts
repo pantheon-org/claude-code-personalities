@@ -9,6 +9,7 @@ import {
 	getAvailablePersonalities,
 	loadPersonality,
 	loadState,
+	PERSONALITIES_DIR,
 	saveState,
 } from "../lib/personalities.js";
 
@@ -21,7 +22,7 @@ if (!arg) {
 	console.log(`Active personality: ${current}\n`);
 	if (available.length === 0) {
 		console.log("No personalities installed.");
-		console.log(`Add JSON files to ~/.config/claude/personalities/data/`);
+		console.log(`Add JSON files to ${PERSONALITIES_DIR}/`);
 	} else {
 		console.log("Available personalities:");
 		for (const name of available) {
