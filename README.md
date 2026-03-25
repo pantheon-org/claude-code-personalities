@@ -103,10 +103,34 @@ cd claude-code-personalities
 bun install
 bun run build
 bun run install:plugin
-claude --plugin-dir .
 ```
 
-`bun run install:plugin` seeds the bundled example personalities into `~/.config/claude/personalities/data/` if none exist yet. The plugin handles hook registration and skill loading automatically via `hooks/hooks.json` and `skills/`.
+`bun run install:plugin` seeds the bundled example personalities into `~/.config/claude/personalities/data/` if none exist yet.
+
+Then register the plugin permanently by adding the local marketplace to `~/.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "local": {
+      "source": {
+        "source": "local",
+        "path": "/absolute/path/to/claude-code-personalities"
+      }
+    }
+  }
+}
+```
+
+Then install it:
+
+```bash
+claude plugins install pantheon-ai@local
+```
+
+The plugin handles hook registration and skill loading automatically via `hooks/hooks.json` and `skills/`.
+
+> **One-session only (dev/testing):** `claude --plugin-dir /path/to/claude-code-personalities` loads the plugin for a single session without modifying settings.
 
 ## Personality schema
 
