@@ -97,7 +97,24 @@ Here is a fully annotated example (`marvin.json`):
 
 ## Installation
 
-> **Note:** This is a local development install. The plugin is also ready for distribution via the Claude Code Plugin marketplace — see [Distribution](#distribution).
+### Via Claude Code (recommended)
+
+**Prerequisites:** Claude Code v1.0.33+ (`claude --version`).
+
+Run inside Claude Code:
+
+```text
+/plugin marketplace add pantheon-org/claude-code-personalities
+/plugin install claude-code-personalities@pantheon-ai
+```
+
+Restart Claude Code or run `/reload-plugins`, then verify:
+
+```text
+/personality
+```
+
+### Local development
 
 ```bash
 git clone https://github.com/pantheon-org/claude-code-personalities
@@ -112,12 +129,6 @@ bun run install:plugin
 1. Seeds the bundled example personalities into `~/.config/claude/personalities/data/` if none exist yet.
 
 2. Creates a `~/.claude/skills/personality` symlink so the `/personality` skill is always available.
-
-Start a new Claude Code session — no flags needed:
-
-```bash
-claude
-```
 
 The registered hook points to your local `dist/` directory. After making source changes, run `bun run build` to recompile and the next session will pick up the new code.
 
