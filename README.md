@@ -97,6 +97,8 @@ Here is a fully annotated example (`marvin.json`):
 
 ## Installation
 
+> **Note:** This is a local development install. The plugin will eventually be distributed as a Claude Code Plugin (plugin marketplace package) — see [Distribution](#distribution) below.
+
 ```bash
 git clone https://github.com/pantheon-org/claude-code-personalities
 cd claude-code-personalities
@@ -105,17 +107,21 @@ bun run build
 bun run install:plugin
 ```
 
-`bun run install:plugin` seeds the bundled example personalities into `~/.config/claude/personalities/data/` if none exist yet.
+`bun run install:plugin` does three things:
 
-Then load the plugin by passing `--plugin-dir` when starting Claude Code:
+1. Seeds the bundled example personalities into `~/.config/claude/personalities/data/` if none exist yet.
+
+2. Registers the `SessionStart` hook in `~/.claude/settings.json` so the personality is injected into every session automatically.
+
+3. Creates a `~/.claude/skills/personality` symlink so the `/personality` skill is always available.
+
+Start a new Claude Code session — no flags needed:
 
 ```bash
-claude --plugin-dir /absolute/path/to/claude-code-personalities
+claude
 ```
 
-The plugin handles hook registration and skill loading automatically via `hooks/hooks.json` and `skills/`.
-
-> **Note:** The `extraKnownMarketplaces` `local` source type is no longer supported by Claude Code. Use `--plugin-dir` instead.
+The registered hook points to your local `dist/` directory. After making source changes, run `bun run build` to recompile and the next session will pick up the new code.
 
 ## Personality schema
 
@@ -134,14 +140,23 @@ The plugin handles hook registration and skill loading automatically via `hooks/
 ## Development
 
 ```bash
-bun install          # install deps
-bun run build        # compile TypeScript → dist/ via Vite
-bun run typecheck    # type-check without emitting
-bun run lint         # biome check
-bun run lint:fix     # biome check --write (auto-fix)
-bun run install:plugin  # seed personality data (first run only)
+bun install             # install deps
+bun run build           # compile TypeScript → dist/ via Vite
+bun run typecheck       # type-check without emitting
+bun run lint            # biome check
+bun run lint:fix        # biome check --write (auto-fix)
+bun run install:plugin  # register hook + skill symlink (first run only)
 ```
 
 Source lives in `src/`, compiled output goes to `dist/` (gitignored).
 
 Pre-commit hooks (via lefthook) run `typecheck`, `lint --write`, and `build` automatically.
+
+## Distribution
+
+The plugin will be published as a Claude Code Plugin via a plugin marketplace. When that happens, the following changes are needed:
+
+- **Add `.claude-plugin/plugin.json`** — the plugin manifest (name, version, description)
+- **Commit `dist/`** — Plugins are installed by cloning the git repo; there is no build step, so compiled output must be in version control
+- **Remove `install:plugin`'s `settings.json` mutation** — Plugins register hooks automatically via `hooks/hooks.json` using `${CLAUDE_PLUGIN_ROOT}`; no manual patching needed
+- **Migrate personality data to `CLAUDE_PLUGIN_DATA_DIR`** — replace the hardcoded `~/.config/claude/personalities/data` path with the Plugin-provided persistent data directory
