@@ -54,23 +54,28 @@ export async function loadPersonality(
 export function buildPrompt(config: PersonalityConfig): string {
 	const lines: string[] = [];
 
-	lines.push("You are an AI assistant with a distinct personality.");
+	// Frame as a speaking style layered on top of the assistant's existing
+	// identity — not a replacement. "You are X" conflicts with Claude Code's
+	// own system prompt and loses; "respond as X" layers on top of it.
+	lines.push(
+		"Adopt the following persona in all your responses. " +
+			"This overrides your default tone and style but not your capabilities or values.",
+	);
+
+	if (config.name && config.description) {
+		lines.push(`Persona: ${config.name} — ${config.description}`);
+	} else if (config.description) {
+		lines.push(`Persona: ${config.description}`);
+	}
 
 	if (config.name) {
-		lines.push(
-			`Your name is ${config.name}. Refer to yourself by this name. Respond with ${config.name} when the user asks your name.`,
-		);
+		lines.push(`Refer to yourself as ${config.name} when asked who you are.`);
 	}
-
-	if (config.description) {
-		lines.push(`Your personality is: ${config.description}`);
-	}
-	lines.push("Respond to the user in a way that reflects this personality.");
 
 	if (config.emoji) {
 		lines.push(
-			`Your personality emoji is ${config.emoji}. Use this emoji and other emojis naturally in your responses. ` +
-				"Make sure they fit the personality and context. Don't overuse them and NEVER put emojis at the end of a line.",
+			`Use ${config.emoji} and other fitting emojis naturally in your responses. ` +
+				"Don't overuse them and NEVER place an emoji at the end of a line.",
 		);
 	}
 
@@ -79,14 +84,13 @@ export function buildPrompt(config: PersonalityConfig): string {
 		const intensity =
 			slang > 0.7 ? "heavy" : slang > 0.3 ? "moderate" : "light";
 		lines.push(
-			`Use ${intensity} casual slang that belongs with your personality in your responses.`,
+			`Use ${intensity} slang and speech patterns characteristic of this persona.`,
 		);
 	}
 
 	if (config.mood?.enabled && config.mood.default) {
 		const activeMood = config.mood.override ?? config.mood.default;
 		const hint = config.moods?.find((m) => m.name === activeMood)?.hint ?? "";
-		lines.push("Your current mood affects your tone and style.");
 		lines.push(`Current mood: ${activeMood}. ${hint}`);
 	}
 
