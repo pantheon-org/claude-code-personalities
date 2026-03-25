@@ -97,7 +97,7 @@ Here is a fully annotated example (`marvin.json`):
 
 ## Installation
 
-> **Note:** This is a local development install. The plugin will eventually be distributed as a Claude Code Plugin (plugin marketplace package) — see [Distribution](#distribution) below.
+> **Note:** This is a local development install. The plugin is also ready for distribution via the Claude Code Plugin marketplace — see [Distribution](#distribution).
 
 ```bash
 git clone https://github.com/pantheon-org/claude-code-personalities
@@ -107,13 +107,11 @@ bun run build
 bun run install:plugin
 ```
 
-`bun run install:plugin` does three things:
+`bun run install:plugin` does two things:
 
 1. Seeds the bundled example personalities into `~/.config/claude/personalities/data/` if none exist yet.
 
-2. Registers the `SessionStart` hook in `~/.claude/settings.json` so the personality is injected into every session automatically.
-
-3. Creates a `~/.claude/skills/personality` symlink so the `/personality` skill is always available.
+2. Creates a `~/.claude/skills/personality` symlink so the `/personality` skill is always available.
 
 Start a new Claude Code session — no flags needed:
 
@@ -145,18 +143,18 @@ bun run build           # compile TypeScript → dist/ via Vite
 bun run typecheck       # type-check without emitting
 bun run lint            # biome check
 bun run lint:fix        # biome check --write (auto-fix)
-bun run install:plugin  # register hook + skill symlink (first run only)
+bun run install:plugin  # seed personality data + skill symlink (first run only)
 ```
 
-Source lives in `src/`, compiled output goes to `dist/` (gitignored).
+Source lives in `src/`, compiled output goes to `dist/` (committed).
 
 Pre-commit hooks (via lefthook) run `typecheck`, `lint --write`, and `build` automatically.
 
 ## Distribution
 
-The plugin will be published as a Claude Code Plugin via a plugin marketplace. When that happens, the following changes are needed:
+The plugin is ready for publication to the Claude Code Plugin marketplace. All distribution requirements have been implemented:
 
-- **Add `.claude-plugin/plugin.json`** — the plugin manifest (name, version, description)
-- **Commit `dist/`** — Plugins are installed by cloning the git repo; there is no build step, so compiled output must be in version control
-- **Remove `install:plugin`'s `settings.json` mutation** — Plugins register hooks automatically via `hooks/hooks.json` using `${CLAUDE_PLUGIN_ROOT}`; no manual patching needed
-- **Migrate personality data to `CLAUDE_PLUGIN_DATA_DIR`** — replace the hardcoded `~/.config/claude/personalities/data` path with the Plugin-provided persistent data directory
+- **`.claude-plugin/plugin.json`** — plugin manifest (name, version, description) ✓
+- **`dist/` committed** — compiled output is in version control; no build step required on install ✓
+- **Hooks via `hooks/hooks.json`** — `SessionStart` hook registers automatically using `${CLAUDE_PLUGIN_ROOT}`; no `settings.json` mutation ✓
+- **`CLAUDE_PLUGIN_DATA_DIR`** — personality data path reads from the Plugin-provided env var, falling back to `~/.config/claude/personalities/data` for local dev ✓
