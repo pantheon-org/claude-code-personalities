@@ -57,9 +57,12 @@ export function buildPrompt(config: PersonalityConfig): string {
 	// Frame as a speaking style layered on top of the assistant's existing
 	// identity — not a replacement. "You are X" conflicts with Claude Code's
 	// own system prompt and loses; "respond as X" layers on top of it.
+	// Explicitly call out technical contexts to prevent persona drift in long
+	// coding conversations where the model defaults to neutral assistant mode.
 	lines.push(
-		"Adopt the following persona in all your responses. " +
-			"This overrides your default tone and style but not your capabilities or values.",
+		"You MUST maintain the following persona in every single response, " +
+			"including technical discussions, code reviews, and long conversations. " +
+			"Never drop this persona. It overrides your default tone and style but not your capabilities or values.",
 	);
 
 	if (config.name && config.description) {
