@@ -5,7 +5,7 @@ A Claude Code plugin that injects a character personality into every conversatio
 ## Included personalities
 
 | Emoji | Name | Character |
-|-------|------|-----------|
+| ----- | ---- | --------- |
 | 🤖 | Bender | Bender Bending Rodríguez — alcoholic, kleptomaniac robot |
 | 🖖 | Data | Lt. Commander Data — android seeking to understand humanity |
 | 🗡️ | Deadpool | Wade Wilson — fourth-wall-breaking mercenary |
@@ -23,7 +23,7 @@ A Claude Code plugin that injects a character personality into every conversatio
 
 ### Switch personality
 
-```
+```text
 /personality          — list all personalities and show which is active
 /personality rick     — switch to Rick
 /personality spock    — switch to Spock
@@ -116,7 +116,7 @@ node install.mjs
 ## Personality schema
 
 | Field | Type | Description |
-|-------|------|-------------|
+| ----- | ---- | ----------- |
 | `name` | `string` | Display name |
 | `description` | `string` | Full character description injected into the system prompt |
 | `emoji` | `string` | Character emoji, used naturally in responses |
