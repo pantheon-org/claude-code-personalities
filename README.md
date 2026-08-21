@@ -165,6 +165,13 @@ Source lives in `src/`, compiled output goes to `dist/` (gitignored locally; com
 
 Pre-commit hooks (via [hk](https://hk.jdx.dev), configured in `hk.pkl`) run `typecheck`, biome lint, and markdownlint (all with auto-fix where available) automatically — using hk's own `Builtins.tsc`, `Builtins.biome`, and `Builtins.markdown_lint` steps, gated to only run when a staged file matches. `hk.pkl` calls tools directly (no `mise run` indirection); resolving them without shell activation relies on the git hook being installed with `hk install --mise`, which `mise install`'s `postinstall` hook does automatically. Markdown rule config lives in `.markdownlint.yaml`; ignored paths live in `.markdownlintignore`. `dist/` is built exclusively by CI.
 
+### CI checks
+
+Two report-only workflows run alongside `ci.yml`, `bundle.yml`, and `release-please.yml`:
+
+- **`ai-hygiene.yml`** — runs `aislop` (code slop) and `ctxharness` (agent-doc drift) via the `mise run slop:check` / `slop:changes` / `ctx` tasks and posts a sticky PR comment plus job summary. Advisory only; never fails the build. The `ctxharness` check currently has nothing to verify against — this repo has no root-level `CLAUDE.md`/`AGENTS.md` yet, so it reports "config not found" until one exists and `ctxharness init` is run to scope real assertions.
+- **`plumber.yml`** — scans this repo's own workflows for CI/CD security issues (unpinned actions, untrusted script input, over-broad permissions) via [Plumber](https://github.com/getplumber/plumber), configured in `.plumber.yaml`. Only a Critical-severity finding blocks a PR (`scripts/plumber-gate.sh`); High/Medium/Low findings are tracked in a rolling backlog issue (`scripts/plumber-file-issues.sh`) and a per-PR comment (`scripts/plumber-pr-comment.sh`), never blocking. `ci.yml`, `bundle.yml`, and `release-please.yml` still reference actions by mutable tag (`@v4`, `@v1`) rather than pinned commit SHA, so expect tracked (non-blocking) findings there until they're repinned.
+
 ## Distribution
 
 The plugin is ready for publication to the Claude Code Plugin marketplace. All distribution requirements have been implemented:

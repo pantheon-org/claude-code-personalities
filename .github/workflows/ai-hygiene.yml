@@ -1,0 +1,165 @@
+name: ai-hygiene
+
+# Warn-only AI-hygiene report. Runs aislop (code slop) and ctxharness (agent-doc
+# drift) and surfaces the results as a sticky PR comment and a job summary.
+# This workflow is advisory only and never fails the build. On a pull request
+# it gates only the files the PR changed; on a push to main it reads the
+# whole repo.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  # Ask mise and the tools to emit plain text, so the captured report has no ANSI
+  # colour codes when it lands in the PR comment.
+  NO_COLOR: "1"
+
+concurrency:
+  group: ai-hygiene-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ai-hygiene:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          # Full history so aislop's --changes diff against the base branch works.
+          fetch-depth: 0
+      - uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
+        with:
+          # Authenticate mise's GitHub releases API calls so tool installs are
+          # not capped at the 60 req/hr unauthenticated rate limit.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Bust the action's install cache: a prior run cached a failed
+          # aislop/ctxharness install, and the cache key doesn't change just
+          # because mise.toml's *contents* are unchanged, so it kept
+          # restoring the same broken state on every retry.
+          cache_key_prefix: mise-v2-ctxharness
+        env:
+          # mise's default npm backend (aube) refuses to install a
+          # low-weekly-download package non-interactively in CI
+          # (npm:ctxharness) rather than prompting; there's no `--allow-low-
+          # downloads` passthrough, so fall back to shelling out to real npm
+          # instead of aube's vetting-heavy resolver.
+          MISE_YES: "1"
+          MISE_NPM_SHELL_OUT: "1"
+
+      - name: Install dependencies
+        run: bun install
+
+      # ctxharness: agent-doc drift. Never fails the step (report only).
+      - name: Check agent docs (ctxharness)
+        run: |
+          if mise run ctx > ctxharness.txt 2>&1; then
+            echo "CTX_OK=true" >> "$GITHUB_ENV"
+          else
+            echo "CTX_OK=false" >> "$GITHUB_ENV"
+          fi
+          cat ctxharness.txt
+
+      # aislop: code slop, changed files on a PR. Report only.
+      - name: Check code slop (aislop, changed files)
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          git fetch --no-tags origin "$BASE_REF"
+          if AISLOP_BASE="origin/$BASE_REF" mise run slop:changes > aislop.txt 2>&1; then
+            echo "SLOP_OK=true" >> "$GITHUB_ENV"
+          else
+            echo "SLOP_OK=false" >> "$GITHUB_ENV"
+          fi
+          cat aislop.txt
+
+      # aislop: code slop, whole repo on main. Report only.
+      - name: Check code slop (aislop, whole repo)
+        if: github.event_name != 'pull_request'
+        run: |
+          if mise run slop:check > aislop.txt 2>&1; then
+            echo "SLOP_OK=true" >> "$GITHUB_ENV"
+          else
+            echo "SLOP_OK=false" >> "$GITHUB_ENV"
+          fi
+          cat aislop.txt
+
+      # Build the shared report body (job summary + PR comment). Default the
+      # status vars so the report still renders if a check step never ran.
+      - name: Compose report
+        run: |
+          {
+            echo "<!-- ai-hygiene-report -->"
+            echo "## AI hygiene report"
+            echo ""
+            slop_icon=$([ "${SLOP_OK:-false}" = "true" ] && echo "✅" || echo "⚠️")
+            ctx_icon=$([ "${CTX_OK:-false}" = "true" ] && echo "✅" || echo "⚠️")
+            echo "- $slop_icon **aislop** (code slop)"
+            echo "- $ctx_icon **ctxharness** (agent-doc drift)"
+            echo ""
+            echo "This report is advisory only and does not block merges."
+            echo ""
+            echo "<details><summary>aislop output</summary>"
+            echo ""
+            echo '```'
+            sed -E 's/\x1b\[[0-9;]*[a-zA-Z]//g' aislop.txt | head -c 40000
+            echo ""
+            echo '```'
+            echo "</details>"
+            echo ""
+            echo "<details><summary>ctxharness output</summary>"
+            echo ""
+            echo '```'
+            sed -E 's/\x1b\[[0-9;]*[a-zA-Z]//g' ctxharness.txt | head -c 40000
+            echo ""
+            echo '```'
+            echo "</details>"
+          } > report.md
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+
+      # Fork PRs run with a read-only GITHUB_TOKEN regardless of the permissions
+      # block above, so the gh api calls would 403. Skip explicitly and let the
+      # job summary carry the report.
+      - name: Skip PR comment for fork PRs
+        if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == true
+        run: echo "::notice::Fork PR — GITHUB_TOKEN is read-only, skipping the sticky comment. The full report is in this check's job summary."
+
+      # Sticky PR comment: update the existing report comment or create one.
+      # This report is advisory, so a transient GitHub API error (e.g. HTTP 503)
+      # must never fail the check. The step is best-effort (continue-on-error)
+      # with a short retry; the full report is always in the job summary
+      # regardless. Runs under if: always() so a failed check step cannot leave
+      # an out-of-date comment behind.
+      - name: Comment on PR
+        if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          retry() {
+            for attempt in 1 2 3; do
+              if "$@"; then
+                return 0
+              fi
+              echo "gh call failed (attempt $attempt of 3); retrying in 5s" >&2
+              sleep 5
+            done
+            echo "gh call still failing after 3 attempts; skipping PR comment" >&2
+            return 1
+          }
+          existing=$(retry gh api "repos/$REPO/issues/$PR/comments" \
+            --jq 'map(select(.body | startswith("<!-- ai-hygiene-report -->"))) | .[0].id // empty') || exit 0
+          if [ -n "$existing" ]; then
+            retry gh api -X PATCH "repos/$REPO/issues/comments/$existing" -F body=@report.md > /dev/null \
+              && echo "Updated comment $existing"
+          else
+            retry gh api -X POST "repos/$REPO/issues/$PR/comments" -F body=@report.md > /dev/null \
+              && echo "Created a new comment"
+          fi

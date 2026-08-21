@@ -1,0 +1,216 @@
+# Plumber Configuration — Trust Policy Manager for GitHub Actions
+# This file is required for 'plumber analyze' to work.
+# Reference: https://github.com/getplumber/plumber
+# Can be regenerated with: plumber config generate
+#
+# Plumber Score publishing is controlled by the workflow, not this file: the
+# plumber.yml workflow passes score-push: "false", so no public badge is ever
+# published. Controls not listed here inherit Plumber's built-in defaults.
+
+version: "2.0"
+
+github:
+  controls:
+    # ===========================================
+    # Actions must be pinned by commit SHA
+    # ===========================================
+    # Mutable tag refs (v4, main) can be retagged: if the action's maintainer
+    # is compromised, the caller silently runs new code with its secrets (the
+    # March 2025 tj-actions/changed-files vector, CVE-2025-30066). First-party
+    # actions/* and github/* are exempt. New workflows pin third-party actions
+    # by SHA with a version comment; existing workflows still on tag refs
+    # (v4, v1) show up as tracked, non-blocking findings until repinned.
+    actionsMustBePinnedByCommitSha:
+      enabled: true
+      trustedOwners:
+        - actions
+        - github
+
+    # ===========================================
+    # Actions must come from authorized sources
+    # ===========================================
+    # Every third-party action runs with the caller workflow's token and
+    # secrets, so vetted sources only. Third-party actions this repo uses:
+    # the mise toolchain installer, Plumber's own action, and release-please.
+    githubActionMustComeFromAuthorizedSources:
+      enabled: true
+      trustGithubOfficialActions: true
+      trustSameOrgActions: true
+      minimumStars: 0
+      trustedGithubActions:
+        - jdx/mise-action # Installs the pinned mise toolchain (mise.toml)
+        - getplumber/plumber # Plumber's own GitHub Action
+        - googleapis/release-please-action # Release PR automation
+
+    # ===========================================
+    # Container images must not use forbidden tags
+    # ===========================================
+    # This repo runs no containers today; keep the control on so a mutable
+    # image tag cannot sneak in later.
+    containerImageMustNotUseForbiddenTags:
+      enabled: true
+      tags:
+        - latest
+        - dev
+        - development
+        - staging
+        - main
+        - master
+      containerImagesMustBePinnedByDigest: false
+
+    # ===========================================
+    # Pipeline must not use Docker-in-Docker
+    # ===========================================
+    pipelineMustNotUseDockerInDocker:
+      enabled: true
+      detectInsecureDaemon: true
+
+    # ===========================================
+    # Pipeline must not execute unverified scripts
+    # ===========================================
+    # No pipe-to-shell or download-then-exec anywhere in these workflows.
+    pipelineMustNotExecuteUnverifiedScripts:
+      enabled: true
+      trustedUrls: []
+
+    # ===========================================
+    # Reusable workflows must not inherit secrets
+    # ===========================================
+    reusableWorkflowsMustNotInheritSecrets:
+      enabled: true
+
+    # ===========================================
+    # Workflow must not export the entire secrets context
+    # ===========================================
+    workflowMustNotExportEntireSecretsContext:
+      enabled: true
+
+    # ===========================================
+    # Security jobs must not be weakened
+    # ===========================================
+    # No scanner job in this repo is allowed to be neutralised via
+    # continue-on-error or manual-dispatch-only triggers.
+    securityJobsMustNotBeWeakened:
+      enabled: true
+      securityJobPatterns:
+        - "*codeql*"
+        - "*dependency-review*"
+        - "*trufflehog*"
+        - "*gitleaks*"
+        - "*osv-scanner*"
+        - "*-sast"
+        - "*-sast-*"
+        - "*-scan"
+        - "*scan*"
+        - "*-security"
+        - "*-security-*"
+        - "*-audit"
+        - "*-audit-*"
+      allowFailureMustBeFalse:
+        enabled: true
+      rulesMustNotBeRedefined:
+        enabled: true
+      whenMustNotBeManual:
+        enabled: true
+
+    # ===========================================
+    # Workflow must not inject user input in scripts
+    # ===========================================
+    # Attacker-controlled values (PR title, branch name) must be bound through
+    # `env:` and referenced from the shell, never interpolated into `run:`.
+    workflowMustNotInjectUserInputInScripts:
+      enabled: true
+
+    # ===========================================
+    # Workflow must not write untrusted content to $GITHUB_ENV / $GITHUB_PATH
+    # ===========================================
+    workflowMustNotWriteUntrustedContentToGitHubEnv:
+      enabled: true
+
+    # ===========================================
+    # Workflow must not use dangerous triggers
+    # ===========================================
+    workflowMustNotUseDangerousTriggers:
+      enabled: true
+
+    # ===========================================
+    # pull_request_target must not check out PR head
+    # ===========================================
+    pullRequestTargetMustNotCheckoutHead:
+      enabled: true
+
+    # ===========================================
+    # Workflows must declare permissions
+    # ===========================================
+    # Least-privilege regardless of the repo-wide GITHUB_TOKEN default.
+    workflowsMustDeclarePermissions:
+      enabled: true
+
+    # ===========================================
+    # Branch must be protected (project governance)
+    # ===========================================
+    # DISABLED: `main` is protected by a GitHub *ruleset*, not classic branch
+    # protection. Plumber v0.4.x only reads the classic branch-protection API
+    # (404 for a ruleset-protected branch), so this control emits a false
+    # positive High regardless of how strong the ruleset is. Re-enable if/when
+    # Plumber gains GitHub-ruleset support, or if classic branch protection is
+    # adopted.
+    branchMustBeProtected:
+      enabled: false
+      defaultMustBeProtected: true
+      namePatterns:
+        - main
+        - master
+        - release/*
+        - production
+        - dev
+      allowForcePush: false
+      codeOwnerApprovalRequired: true
+
+    # ===========================================
+    # Workflows must include required actions
+    # ===========================================
+    # Opt-in once the required action set is settled; this repo has none.
+    workflowMustIncludeRequiredActions:
+      enabled: false
+      requiredGroups: []
+
+    # ===========================================
+    # Workflow must not grant write-all permissions
+    # ===========================================
+    workflowMustNotGrantPermissionsWriteAll:
+      enabled: true
+
+    # ===========================================
+    # Actions must not use ambiguous tag/branch refs
+    # ===========================================
+    externalRefsMustNotCollide:
+      enabled: true
+
+    # ===========================================
+    # Actions must not reference archived repositories
+    # ===========================================
+    actionsMustNotBeArchived:
+      enabled: true
+
+    # ===========================================
+    # Actions must not carry known CVEs
+    # ===========================================
+    actionsMustNotCarryKnownCVEs:
+      enabled: true
+
+    # ===========================================
+    # Actions must pin commits that exist upstream
+    # ===========================================
+    actionRefsMustExistUpstream:
+      enabled: true
+
+    # ===========================================
+    # Pipeline must not enable debug trace
+    # ===========================================
+    # ACTIONS_*_DEBUG dumps masked secrets into the run log in plaintext.
+    pipelineMustNotEnableDebugTrace:
+      enabled: true
+      forbiddenVariables:
+        - ACTIONS_STEP_DEBUG
+        - ACTIONS_RUNNER_DEBUG

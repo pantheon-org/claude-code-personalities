@@ -3,7 +3,10 @@ bun = "latest"
 node = "20"
 hk = "latest"
 biome = "latest"
+actionlint = "latest"
 "npm:markdownlint-cli" = "latest"
+"npm:aislop" = "latest"
+"npm:ctxharness" = "latest"
 
 [hooks]
 enter = "mise install; bun install"
@@ -28,3 +31,15 @@ run = "bun run src/cli/switch.ts"
 [tasks."install:plugin"]
 description = "Seed personality data and the skill symlink for local dev"
 run = "node dist/install.mjs"
+
+[tasks.ctx]
+description = "Check AI instruction files (AGENTS.md/CLAUDE.md) for drift"
+run = "ctxharness run --no-trend"
+
+[tasks."slop:check"]
+description = "Run the aislop quality gate over the whole repo"
+run = "aislop ci"
+
+[tasks."slop:changes"]
+description = "Run the aislop quality gate over changed files (AISLOP_BASE, default HEAD)"
+run = "aislop ci --changes --base ${AISLOP_BASE:-HEAD}"

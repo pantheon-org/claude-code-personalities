@@ -10,6 +10,18 @@ hooks {
             }
             ["lint"] = Builtins.biome
             ["markdown"] = Builtins.markdown_lint
+            ["actionlint"] = Builtins.actionlint
+            ["aislop"] {
+                check = "aislop ci --staged"
+            }
+            ["trailing-whitespace"] = Builtins.trailing_whitespace
+            ["end-of-file-fixer"] = Builtins.newlines
+            ["check-merge-conflict"] = Builtins.check_merge_conflict
+            ["check-added-large-files"] = Builtins.check_added_large_files
+            ["check-case-conflict"] = Builtins.check_case_conflict
+            ["detect-private-key"] = Builtins.detect_private_key
+            ["check-executables-have-shebangs"] = Builtins.check_executables_have_shebangs
+            ["mixed-line-ending"] = Builtins.mixed_line_ending
         }
     }
 }

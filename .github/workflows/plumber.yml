@@ -1,0 +1,93 @@
+name: Plumber
+
+# CI/CD security scanning for this repository's GitHub Actions workflows and
+# repository configuration (unpinned actions, untrusted shell input, missing
+# branch protection, over-broad permissions). Findings surface in three places:
+# the Security tab (Code Scanning SARIF), a per-PR compliance comment, and — for
+# High/Medium/Low — a single persistent backlog issue.
+#
+# Gating model (ported from pantheon-org/tekhne):
+#   - Critical findings BLOCK the PR (scripts/plumber-gate.sh).
+#   - High/Medium/Low are tracked, never blocking: a rolling backlog issue on
+#     push to main (scripts/plumber-file-issues.sh) and a per-PR comment
+#     (scripts/plumber-pr-comment.sh).
+# The Plumber action itself runs with soft-fail + continue-on-error so its own
+# A-E score gate and any transient runtime error (e.g. a rate-limited SLSA
+# attestation check during a PR burst) never block; the ONLY blocking signal is
+# a Critical finding via plumber-gate.sh. Config lives in .plumber.yaml at the
+# repo root (required by the action).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+  schedule:
+    # Weekly scan (Mondays 03:41 UTC) to catch security drift and newly
+    # published action advisories between changes.
+    - cron: "41 3 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  # Supersede an in-flight run when the ref updates (e.g. a rebase), so
+  # stale runs are cancelled instead of piling onto the shared API quota.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plumber:
+    name: Plumber Score
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      security-events: write # upload SARIF to Code Scanning
+      issues: write # maintain the High/Medium/Low backlog issue
+      pull-requests: write # post the compliance comment on PRs
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - id: plumber
+        uses: getplumber/plumber@7970e5df1e7d217de41b2880832b63a6f2152b97 # v0.4.8
+        # soft-fail: the action never fails on its own A-E score. continue-on-error:
+        # a transient runtime error must not block either — the Critical gate below
+        # is the only blocking signal. SARIF upload to Code Scanning is left on
+        # (default); `output` just fixes the JSON report path for the scripts.
+        continue-on-error: true
+        with:
+          soft-fail: "true"
+          # Publishing a public score badge to score.getplumber.io is an explicit
+          # opt-in; keep it off. To enable, set "true" and add `id-token: write`.
+          score-push: "false"
+          output: results.json
+
+      # Critical findings block the PR. Reads the JSON report the action wrote;
+      # tolerant of a missing report (transient scan error → warn, don't block).
+      - name: Gate on Critical findings
+        run: scripts/plumber-gate.sh results.json
+
+      # Rolling backlog issue for High/Medium/Low. Push-to-main only: it reflects
+      # the state of main, not a PR branch's speculative merged state — running it
+      # on PRs would make concurrent PRs fight over the single rollup issue.
+      - name: File issues for High/Medium/Low findings
+        if: always() && github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: scripts/plumber-file-issues.sh results.json
+
+      # Fork PRs run with a read-only GITHUB_TOKEN regardless of the permissions
+      # block above, so gh pr comment would 403.
+      - name: Skip PR comment for fork PRs
+        if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == true
+        run: echo "::notice::Fork PR — GITHUB_TOKEN is read-only, skipping the compliance comment. See this check's log and the Critical gate result."
+
+      - name: Comment compliance result on the PR
+        if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: scripts/plumber-pr-comment.sh results.json
