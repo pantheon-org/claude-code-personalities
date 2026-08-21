@@ -7,13 +7,16 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - uses: jdx/mise-action@v4
+      - uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
         with:
           # Bust the action's install cache: a prior run cached a failed
           # aislop/ctxharness install, and the cache key doesn't change just
