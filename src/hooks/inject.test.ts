@@ -67,7 +67,8 @@ describe("inject hook", () => {
 			expect(exitCode).toBe(0);
 
 			const output = JSON.parse(stdout);
-			expect(output.additionalContext).toContain(
+			expect(output.hookSpecificOutput.hookEventName).toBe("SessionStart");
+			expect(output.hookSpecificOutput.additionalContext).toContain(
 				"Persona: Solo — The only option.",
 			);
 
@@ -101,7 +102,9 @@ describe("inject hook", () => {
 			expect(exitCode).toBe(0);
 
 			const output = JSON.parse(stdout);
-			expect(output.additionalContext).toContain("Persona: The only option.");
+			expect(output.hookSpecificOutput.additionalContext).toContain(
+				"Persona: The only option.",
+			);
 		} finally {
 			rmSync(tmpRoot, { recursive: true, force: true });
 		}
@@ -129,7 +132,9 @@ describe("inject hook", () => {
 			expect(exitCode).toBe(0);
 
 			const output = JSON.parse(stdout);
-			expect(output.additionalContext).toContain("Persona: Personality B.");
+			expect(output.hookSpecificOutput.additionalContext).toContain(
+				"Persona: Personality B.",
+			);
 		} finally {
 			rmSync(tmpRoot, { recursive: true, force: true });
 		}
