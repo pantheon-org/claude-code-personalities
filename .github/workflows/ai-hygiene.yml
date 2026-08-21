@@ -43,10 +43,13 @@ jobs:
           # restoring the same broken state on every retry.
           cache_key_prefix: mise-v2-ctxharness
         env:
-          # mise's npm backend prompts for confirmation the first time it
-          # resolves a package (aislop/ctxharness); there's no TTY in CI to
-          # answer it, so `mise install` aborts without this.
+          # mise's default npm backend (aube) refuses to install a
+          # low-weekly-download package non-interactively in CI
+          # (npm:ctxharness) rather than prompting; there's no `--allow-low-
+          # downloads` passthrough, so fall back to shelling out to real npm
+          # instead of aube's vetting-heavy resolver.
           MISE_YES: "1"
+          MISE_NPM_SHELL_OUT: "1"
 
       - name: Install dependencies
         run: bun install
