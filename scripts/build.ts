@@ -15,38 +15,20 @@ const shared = {
 	},
 };
 
-await build({
-	...shared,
-	build: {
-		...shared.build,
-		lib: {
-			entry: "src/hooks/inject.ts",
-			fileName: () => "hooks/inject.mjs",
-			formats: ["es" as const],
+async function buildEntry(entry: string, fileName: string) {
+	await build({
+		...shared,
+		build: {
+			...shared.build,
+			lib: {
+				entry,
+				fileName: () => fileName,
+				formats: ["es" as const],
+			},
 		},
-	},
-});
+	});
+}
 
-await build({
-	...shared,
-	build: {
-		...shared.build,
-		lib: {
-			entry: "src/cli/switch.ts",
-			fileName: () => "cli/switch.mjs",
-			formats: ["es" as const],
-		},
-	},
-});
-
-await build({
-	...shared,
-	build: {
-		...shared.build,
-		lib: {
-			entry: "src/install.ts",
-			fileName: () => "install.mjs",
-			formats: ["es" as const],
-		},
-	},
-});
+await buildEntry("src/hooks/inject.ts", "hooks/inject.mjs");
+await buildEntry("src/cli/switch.ts", "cli/switch.mjs");
+await buildEntry("src/install.ts", "install.mjs");
