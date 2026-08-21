@@ -1205,7 +1205,7 @@ var gn = /*@__PURE__*/ s("$ZodObject", (e, t) => {
             })));
           }
         }
-        
+
         if (${n}.value === undefined) {
           if (${o} in input) {
             newResult[${o}] = undefined;
@@ -1213,7 +1213,7 @@ var gn = /*@__PURE__*/ s("$ZodObject", (e, t) => {
         } else {
           newResult[${o}] = ${n}.value;
         }
-        
+
       `) : c ? t.write(`
         if (${n}.issues.length) {
           payload.issues = payload.issues.concat(${n}.issues.map(iss => ({
@@ -1221,7 +1221,7 @@ var gn = /*@__PURE__*/ s("$ZodObject", (e, t) => {
             path: iss.path ? [${o}, ...iss.path] : [${o}]
           })));
         }
-        
+
         if (${n}.value === undefined) {
           if (${o} in input) {
             newResult[${o}] = undefined;
@@ -1229,7 +1229,7 @@ var gn = /*@__PURE__*/ s("$ZodObject", (e, t) => {
         } else {
           newResult[${o}] = ${n}.value;
         }
-        
+
       `) : t.write(`
         const ${n}_present = ${o} in input;
         if (${n}.issues.length) {
@@ -3060,5 +3060,8 @@ if (!$ || !Q.includes($.current)) {
 	await qa(e), $ = { current: e };
 }
 var Xa = await Ja($.current);
-console.log(JSON.stringify({ additionalContext: Ya(Xa) }));
+console.log(JSON.stringify({ hookSpecificOutput: {
+	hookEventName: "SessionStart",
+	additionalContext: Ya(Xa)
+} }));
 //#endregion
