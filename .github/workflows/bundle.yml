@@ -31,6 +31,11 @@ jobs:
           token: ${{ steps.token.outputs.token }}
 
       - uses: jdx/mise-action@v4
+        env:
+          # mise's npm backend prompts for confirmation the first time it
+          # resolves a package (aislop/ctxharness/actionlint); there's no TTY
+          # in CI to answer it, so `mise install` aborts without this.
+          MISE_YES: "1"
 
       - run: bun install
 

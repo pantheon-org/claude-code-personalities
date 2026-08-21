@@ -37,6 +37,11 @@ jobs:
           # Authenticate mise's GitHub releases API calls so tool installs are
           # not capped at the 60 req/hr unauthenticated rate limit.
           github_token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          # mise's npm backend prompts for confirmation the first time it
+          # resolves a package (aislop/ctxharness); there's no TTY in CI to
+          # answer it, so `mise install` aborts without this.
+          MISE_YES: "1"
 
       - name: Install dependencies
         run: bun install
