@@ -10,7 +10,7 @@ A Claude Code plugin: a `SessionStart` hook injects a character personality into
 
 - **Single agent tool**: this repo is developed with Claude Code only (no opencode/shared `.agents` config across tools).
 - **Meta-skills**: `.agents/skills/<name>/SKILL.md` holds skills for *developing this plugin* (not shipped to end users). `.claude/skills/<name>` symlinks to each one so Claude Code discovers them locally. See `.agents/skills/README.md` for the list.
-- **End-user skills** ship from `skills/` at the repo root (currently `skills/personality.md`), registered via `.claude-plugin/plugin.json`'s `"skills"` field.
+- **End-user skills** ship from `skills/` at the repo root (currently `skills/personality/SKILL.md`), registered via `.claude-plugin/plugin.json`'s `"skills"` field. Claude Code's auto-discovery only scans `skills/` for subdirectories containing a `SKILL.md` — a flat `skills/<name>.md` file is never discovered.
 
 ## Instructions
 

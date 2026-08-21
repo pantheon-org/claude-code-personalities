@@ -47,10 +47,10 @@ assertions:
   - id: path-skills-personality-md
     extractor: fileExists
     extractorArgs:
-      path: 'skills/personality.md'
+      path: 'skills/personality/SKILL.md'
     scanner: literalInMd
     scannerArgs:
-      literal: 'skills/personality.md'
+      literal: 'skills/personality/SKILL.md'
   - id: path-agents-instructions-aislop-md
     extractor: fileExists
     extractorArgs:
