@@ -30,15 +30,13 @@ jobs:
         with:
           token: ${{ steps.token.outputs.token }}
 
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
+      - uses: jdx/mise-action@v4
 
       - run: bun install
 
-      - run: bun run typecheck
+      - run: mise run typecheck
 
-      - run: bun run build
+      - run: mise run build
 
       - name: Commit dist
         run: |

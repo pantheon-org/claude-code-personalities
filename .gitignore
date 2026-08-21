@@ -1,5 +1,6 @@
 node_modules/
 bun.lock
+mise.lock
 *.local
 dist/
 .env
@@ -7,3 +8,6 @@ dist/
 skills-lock.json
 .claude/skills/
 .agents/
+.aislop/
+hk.local.pkl
+!mise.toml

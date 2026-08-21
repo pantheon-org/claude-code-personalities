@@ -119,18 +119,20 @@ Restart Claude Code or run `/reload-plugins`, then verify:
 ```bash
 git clone https://github.com/pantheon-org/claude-code-personalities
 cd claude-code-personalities
-bun install
-bun run build
-bun run install:plugin
+mise install
+mise run build
+mise run install:plugin
 ```
 
-`bun run install:plugin` does two things:
+`mise install` triggers a `postinstall` hook that runs `hk install --mise` automatically, registering the pre-commit git hook so it invokes hooks via `mise x` (no shell activation required for mise-managed tools to resolve). If you have `mise activate` wired into your shell, entering the project directory also runs an `enter` hook (`mise install; bun install`) that keeps tool versions and JS dependencies up to date automatically.
+
+`mise run install:plugin` does two things:
 
 1. Seeds the bundled example personalities into `~/.config/claude/personalities/data/` if none exist yet.
 
 2. Creates a `~/.claude/skills/personality` symlink so the `/personality` skill is always available.
 
-The registered hook points to your local `dist/` directory. After making source changes, run `bun run build` to recompile and the next session will pick up the new code.
+The registered hook points to your local `dist/` directory. After making source changes, run `mise run build` to recompile and the next session will pick up the new code.
 
 ## Personality schema
 
@@ -148,18 +150,22 @@ The registered hook points to your local `dist/` directory. After making source 
 
 ## Development
 
+Tool versions (bun, node, hk, biome, markdownlint-cli2) are managed by [mise](https://mise.jdx.dev) via `mise.toml`. Run `mise install` once after cloning to install them — this also triggers `hk install --mise` via a `postinstall` hook.
+
 ```bash
-bun install             # install deps
-bun run build           # compile TypeScript → dist/ via Vite
-bun run typecheck       # type-check without emitting
-bun run lint            # biome check
-bun run lint:fix        # biome check --write (auto-fix)
-bun run install:plugin  # seed personality data + skill symlink (first run only)
+bun install                    # install JS dependencies
+mise run build                 # compile TypeScript → dist/ via Vite
+mise run typecheck             # type-check without emitting
+mise run lint                  # biome check
+mise run lint:fix              # biome check --write (auto-fix)
+mise run lint:markdown         # markdownlint-cli2 check
+mise run lint:markdown:fix     # markdownlint-cli2 --fix (auto-fix)
+mise run install:plugin        # seed personality data + skill symlink (first run only)
 ```
 
 Source lives in `src/`, compiled output goes to `dist/` (gitignored locally; committed to `main` by the `bundle.yml` CI workflow).
 
-Pre-commit hooks (via lefthook) run `typecheck` and `lint --write` automatically. `dist/` is built exclusively by CI.
+Pre-commit hooks (via [hk](https://hk.jdx.dev), configured in `hk.pkl`) run `typecheck`, biome lint (auto-fix), and markdownlint-cli2 (auto-fix) automatically — the lint and markdown steps only touch files staged in that commit. `hk.pkl` calls tools directly (no `mise run` indirection); resolving them without shell activation relies on the git hook being installed with `hk install --mise`, which `mise install`'s `postinstall` hook does automatically. `dist/` is built exclusively by CI.
 
 ## Distribution
 
