@@ -3,7 +3,7 @@ bun = "latest"
 node = "20"
 hk = "latest"
 biome = "latest"
-markdownlint-cli2 = "latest"
+"npm:markdownlint-cli" = "latest"
 
 [hooks]
 enter = "mise install; bun install"
@@ -46,9 +46,9 @@ description = "Format src/ with biome"
 run = "biome format --write src/"
 
 [tasks."lint:markdown"]
-description = "Lint markdown files with markdownlint-cli2"
-run = 'markdownlint-cli2 "**/*.md"'
+description = "Lint markdown files with markdownlint"
+run = 'markdownlint "**/*.md"'
 
 [tasks."lint:markdown:fix"]
-description = "Lint and auto-fix markdown files with markdownlint-cli2"
-run = 'markdownlint-cli2 --fix "**/*.md"'
+description = "Lint and auto-fix markdown files with markdownlint"
+run = 'markdownlint --fix "**/*.md"'

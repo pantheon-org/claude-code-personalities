@@ -9,11 +9,7 @@ hooks {
                 check = "bunx tsc --noEmit -p {{workspace_indicator}}"
             }
             ["lint"] = Builtins.biome
-            ["markdown"] {
-                glob = List("**/*.md", "**/*.markdown")
-                check = "markdownlint-cli2 {{files}}"
-                fix = "markdownlint-cli2 --fix {{files}}"
-            }
+            ["markdown"] = Builtins.markdown_lint
         }
     }
 }

@@ -150,7 +150,7 @@ The registered hook points to your local `dist/` directory. After making source 
 
 ## Development
 
-Tool versions (bun, node, hk, biome, markdownlint-cli2) are managed by [mise](https://mise.jdx.dev) via `mise.toml`. Run `mise install` once after cloning to install them — this also triggers `hk install --mise` via a `postinstall` hook.
+Tool versions (bun, node, hk, biome, markdownlint) are managed by [mise](https://mise.jdx.dev) via `mise.toml`. Run `mise install` once after cloning to install them — this also triggers `hk install --mise` via a `postinstall` hook.
 
 ```bash
 bun install                    # install JS dependencies
@@ -158,14 +158,14 @@ mise run build                 # compile TypeScript → dist/ via Vite
 mise run typecheck             # type-check without emitting
 mise run lint                  # biome check
 mise run lint:fix              # biome check --write (auto-fix)
-mise run lint:markdown         # markdownlint-cli2 check
-mise run lint:markdown:fix     # markdownlint-cli2 --fix (auto-fix)
+mise run lint:markdown         # markdownlint check
+mise run lint:markdown:fix     # markdownlint --fix (auto-fix)
 mise run install:plugin        # seed personality data + skill symlink (first run only)
 ```
 
 Source lives in `src/`, compiled output goes to `dist/` (gitignored locally; committed to `main` by the `bundle.yml` CI workflow).
 
-Pre-commit hooks (via [hk](https://hk.jdx.dev), configured in `hk.pkl`) run `typecheck`, biome lint (auto-fix), and markdownlint-cli2 (auto-fix) automatically — the lint and markdown steps only touch files staged in that commit. `hk.pkl` calls tools directly (no `mise run` indirection); resolving them without shell activation relies on the git hook being installed with `hk install --mise`, which `mise install`'s `postinstall` hook does automatically. `dist/` is built exclusively by CI.
+Pre-commit hooks (via [hk](https://hk.jdx.dev), configured in `hk.pkl`) run `typecheck`, biome lint, and markdownlint (all with auto-fix where available) automatically — using hk's own `Builtins.tsc`, `Builtins.biome`, and `Builtins.markdown_lint` steps, gated to only run when a staged file matches. `hk.pkl` calls tools directly (no `mise run` indirection); resolving them without shell activation relies on the git hook being installed with `hk install --mise`, which `mise install`'s `postinstall` hook does automatically. Markdown rule config lives in `.markdownlint.yaml`; ignored paths live in `.markdownlintignore`. `dist/` is built exclusively by CI.
 
 ## Distribution
 
