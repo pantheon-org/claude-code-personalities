@@ -1,0 +1,15 @@
+amends "package://github.com/jdx/hk/releases/download/v1.56.0/hk@1.56.0#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v1.56.0/hk@1.56.0#/Builtins.pkl"
+
+hooks {
+    ["pre-commit"] {
+        fix = true
+        steps {
+            ["typecheck"] = (Builtins.tsc) {
+                check = "bunx tsc --noEmit -p {{workspace_indicator}}"
+            }
+            ["lint"] = Builtins.biome
+            ["markdown"] = Builtins.markdown_lint
+        }
+    }
+}

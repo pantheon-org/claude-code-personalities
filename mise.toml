@@ -1,0 +1,30 @@
+[tools]
+bun = "latest"
+node = "20"
+hk = "latest"
+biome = "latest"
+"npm:markdownlint-cli" = "latest"
+
+[hooks]
+enter = "mise install; bun install"
+postinstall = "hk install --mise"
+
+[tasks.build]
+description = "Compile TypeScript to dist/ via Vite"
+run = "bun run scripts/build.ts"
+
+[tasks."generate:schema"]
+description = "Generate the personality JSON schema from the Zod types"
+run = "bun run scripts/generate-schema.ts"
+
+[tasks."dev:hook"]
+description = "Run the SessionStart hook locally"
+run = "bun run src/hooks/inject.ts"
+
+[tasks."dev:cli"]
+description = "Run the personality switcher CLI locally"
+run = "bun run src/cli/switch.ts"
+
+[tasks."install:plugin"]
+description = "Seed personality data and the skill symlink for local dev"
+run = "node dist/install.mjs"
