@@ -55,12 +55,13 @@ A Claude Code plugin: a `SessionStart` hook injects a character personality into
 - Commands:
   - `bunx tsc --noEmit` — type-check
   - `biome check src/` (add `--write` to fix) — lint/format
+  - `mise run test` (or `bun test`) — run the unit test suite (`src/**/*.test.ts`)
   - `mise run build` — compile `src/` to `dist/` via Vite
   - `mise run generate:schema` — regenerate `schema/personality.schema.json` from the Zod types
   - `mise run install:plugin` — seed personality data + skill symlink for local dev
   - `mise run dev:hook` / `mise run dev:cli` — run the hook/CLI directly against `src/` without building
-- Pre-commit hooks (`hk.pkl`, installed via `hk install --mise`) run automatically: typecheck, biome, markdownlint, actionlint, `aislop ci --staged`, plus generic hygiene checks (trailing whitespace, EOF newline, merge-conflict markers, large files, case conflicts, private keys, executable shebangs, mixed line endings). `hk run pre-commit` runs the same checks on demand. The same set (minus auto-fix, using `aislop ci` over the whole repo instead of `--staged`) runs again at pre-push as a final gate — `hk run pre-push` on demand. `ctxharness` is intentionally not in either hook yet (see [Instructions](#instructions) above).
-- CI: `ci.yml` (typecheck + lint), `bundle.yml` (builds and commits `dist/` to `main`), `release-please.yml` (versioning/releases), `ai-hygiene.yml` (aislop + ctxharness report, advisory only), `plumber.yml` (workflow security scan, config in `.plumber.yaml`; only a Critical finding blocks a PR).
+- Pre-commit hooks (`hk.pkl`, installed via `hk install --mise`) run automatically: typecheck, biome, markdownlint, actionlint, `aislop ci --staged`, plus generic hygiene checks (trailing whitespace, EOF newline, merge-conflict markers, large files, case conflicts, private keys, executable shebangs, mixed line endings). `hk run pre-commit` runs the same checks on demand. The same set (minus auto-fix, using `aislop ci` over the whole repo instead of `--staged`) runs again at pre-push as a final gate, plus `bun test` (deliberately pre-push only, not pre-commit, since it's slower and every commit doesn't need it re-run) — `hk run pre-push` on demand. `ctxharness` is intentionally not in either hook yet (see [Instructions](#instructions) above).
+- CI: `ci.yml` (typecheck + lint + `bun test`), `bundle.yml` (builds and commits `dist/` to `main`), `release-please.yml` (versioning/releases), `ai-hygiene.yml` (aislop + ctxharness report, advisory only), `plumber.yml` (workflow security scan, config in `.plumber.yaml`; only a Critical finding blocks a PR).
 
 ### Quality gates
 
@@ -75,7 +76,7 @@ Follow what's actually in `src/` — this repo does **not** use the arrow-functi
 - Relative imports include the `.js` extension (e.g. `from "./types.js"`) even though the source is `.ts` — required by `moduleResolution: "bundler"` in `tsconfig.json`.
 - Zod schemas use `.strict()` on every object schema; derive types with `z.infer<typeof Schema>` rather than hand-writing interfaces.
 - Formatting is enforced by Biome, not by convention: tabs, double quotes, trailing commas (`biome.json`). Run `biome check --write src/` rather than hand-formatting.
-- No test suite exists yet (`bun test` is not wired into any task). Don't assume test commands.
+- Tests live next to the code they cover as `*.test.ts` (e.g. `src/lib/personalities.test.ts`), run via `bun test` / `mise run test`. `src/hooks/inject.ts`, `src/cli/switch.ts`, and `src/install.ts` execute their logic at module scope on import, so they're tested by spawning them as subprocesses (`Bun.spawn`) with `HOME`/`CLAUDE_PLUGIN_DATA_DIR` pointed at a temp directory, rather than importing them directly. `src/lib/personalities.ts` is tested by importing it directly after setting those same env vars, using a cache-busting query string on the import so each test gets a fresh module instance with `PERSONALITIES_DIR`/`STATE_FILE` recomputed. Not wired into `hk.pkl` or CI yet — that's a separate decision from having the suite exist.
 
 ## Before finishing a session
 
