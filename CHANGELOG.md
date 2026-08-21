@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0](https://github.com/pantheon-org/claude-code-personalities/compare/v1.0.3...v1.1.0) (2026-08-21)
+
+
+### Features
+
+* configure ctxharness to fix ai-hygiene report warning ([#24](https://github.com/pantheon-org/claude-code-personalities/issues/24)) ([3998828](https://github.com/pantheon-org/claude-code-personalities/commit/3998828988ae3a4c39a4d641e60ed79e57a712b7))
+
+
+### Bug Fixes
+
+* pin jdx/mise-action by commit SHA and add ci.yml permissions ([#21](https://github.com/pantheon-org/claude-code-personalities/issues/21)) ([b2e8573](https://github.com/pantheon-org/claude-code-personalities/commit/b2e8573528b25b13cf28de345d4d32c4c729de3e))
+* wrap SessionStart hook output in hookSpecificOutput ([#27](https://github.com/pantheon-org/claude-code-personalities/issues/27)) ([986d1fb](https://github.com/pantheon-org/claude-code-personalities/commit/986d1fb040dec171721ec916ceca2a5dcdaf24ed))
+
 ## [1.0.3](https://github.com/pantheon-org/claude-code-personalities/compare/v1.0.2...v1.0.3) (2026-03-25)
 
 
