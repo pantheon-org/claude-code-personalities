@@ -65,6 +65,12 @@ jobs:
           ref: ${{ needs.release-please.outputs.tag_name }}
 
       - uses: jdx/mise-action@v4
+        with:
+          # Bust the action's install cache: a prior run cached a failed
+          # aislop/ctxharness install, and the cache key doesn't change just
+          # because mise.toml's *contents* are unchanged, so it kept
+          # restoring the same broken state on every retry.
+          cache_key_prefix: mise-v2-ctxharness
         env:
           # mise's npm backend prompts for confirmation the first time it
           # resolves a package (aislop/ctxharness/actionlint); there's no TTY
