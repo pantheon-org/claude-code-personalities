@@ -16,6 +16,10 @@ postinstall = "hk install --mise"
 description = "Compile TypeScript to dist/ via Vite"
 run = "bun run scripts/build.ts"
 
+[tasks.test]
+description = "Run the bun test suite under src/"
+run = "bun test"
+
 [tasks."generate:schema"]
 description = "Generate the personality JSON schema from the Zod types"
 run = "bun run scripts/generate-schema.ts"
