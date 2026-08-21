@@ -3,9 +3,10 @@ import "package://github.com/jdx/hk/releases/download/v1.56.0/hk@1.56.0#/Builtin
 
 // Shared with pre-push as a final check-only gate before code leaves the
 // machine (e.g. a commit made with --no-verify, or on another machine).
-// ctxharness is deliberately NOT included here yet: it has no .ctxharness.yml,
-// and its file-existence assertions need real, disambiguated path claims in
-// AGENTS.md/README.md first — adding it now would just hard-fail every push.
+// ctxharness is deliberately NOT included here: .ctxharness.yml now exists
+// with tailored assertions and passes, but wiring doc-drift detection into a
+// blocking local gate is a separate decision from having the ai-hygiene.yml
+// report be accurate — it stays advisory-only in CI for now.
 local hygieneChecks = new Mapping<String, Step> {
     ["typecheck"] = (Builtins.tsc) {
         check = "bunx tsc --noEmit -p {{workspace_indicator}}"
