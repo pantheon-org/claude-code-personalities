@@ -38,6 +38,9 @@ hooks {
             ["aislop"] {
                 check = "aislop ci"
             }
+            ["test"] {
+                check = "bun test"
+            }
         }
     }
 }

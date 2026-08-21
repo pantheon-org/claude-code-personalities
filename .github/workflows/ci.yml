@@ -37,3 +37,5 @@ jobs:
       - run: bunx tsc --noEmit
 
       - run: biome check src/
+
+      - run: bun test
