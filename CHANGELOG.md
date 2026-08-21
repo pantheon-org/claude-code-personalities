@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/pantheon-org/claude-code-personalities/compare/v1.1.0...v1.1.1) (2026-08-21)
+
+
+### Bug Fixes
+
+* move personality skill into required SKILL.md subdirectory shape ([#33](https://github.com/pantheon-org/claude-code-personalities/issues/33)) ([404568f](https://github.com/pantheon-org/claude-code-personalities/commit/404568f368f1c286003c9813deb2d7c03caf6627))
+
 ## [1.1.0](https://github.com/pantheon-org/claude-code-personalities/compare/v1.0.3...v1.1.0) (2026-08-21)
 
 
