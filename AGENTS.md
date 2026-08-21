@@ -59,7 +59,7 @@ A Claude Code plugin: a `SessionStart` hook injects a character personality into
   - `mise run generate:schema` — regenerate `schema/personality.schema.json` from the Zod types
   - `mise run install:plugin` — seed personality data + skill symlink for local dev
   - `mise run dev:hook` / `mise run dev:cli` — run the hook/CLI directly against `src/` without building
-- Pre-commit hooks (`hk.pkl`, installed via `hk install --mise`) run automatically: typecheck, biome, markdownlint, actionlint, `aislop ci --staged`, plus generic hygiene checks (trailing whitespace, EOF newline, merge-conflict markers, large files, case conflicts, private keys, executable shebangs, mixed line endings). `hk run pre-commit` runs the same checks on demand.
+- Pre-commit hooks (`hk.pkl`, installed via `hk install --mise`) run automatically: typecheck, biome, markdownlint, actionlint, `aislop ci --staged`, plus generic hygiene checks (trailing whitespace, EOF newline, merge-conflict markers, large files, case conflicts, private keys, executable shebangs, mixed line endings). `hk run pre-commit` runs the same checks on demand. The same set (minus auto-fix, using `aislop ci` over the whole repo instead of `--staged`) runs again at pre-push as a final gate — `hk run pre-push` on demand. `ctxharness` is intentionally not in either hook yet (see [Instructions](#instructions) above).
 - CI: `ci.yml` (typecheck + lint), `bundle.yml` (builds and commits `dist/` to `main`), `release-please.yml` (versioning/releases), `ai-hygiene.yml` (aislop + ctxharness report, advisory only), `plumber.yml` (workflow security scan, config in `.plumber.yaml`; only a Critical finding blocks a PR).
 
 ### Quality gates

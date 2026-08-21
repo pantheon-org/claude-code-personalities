@@ -1,27 +1,42 @@
 amends "package://github.com/jdx/hk/releases/download/v1.56.0/hk@1.56.0#/Config.pkl"
 import "package://github.com/jdx/hk/releases/download/v1.56.0/hk@1.56.0#/Builtins.pkl"
 
+// Shared with pre-push as a final check-only gate before code leaves the
+// machine (e.g. a commit made with --no-verify, or on another machine).
+// ctxharness is deliberately NOT included here yet: it has no .ctxharness.yml,
+// and its file-existence assertions need real, disambiguated path claims in
+// AGENTS.md/README.md first — adding it now would just hard-fail every push.
+local hygieneChecks = new Mapping<String, Step> {
+    ["typecheck"] = (Builtins.tsc) {
+        check = "bunx tsc --noEmit -p {{workspace_indicator}}"
+    }
+    ["lint"] = Builtins.biome
+    ["markdown"] = Builtins.markdown_lint
+    ["actionlint"] = Builtins.actionlint
+    ["trailing-whitespace"] = Builtins.trailing_whitespace
+    ["end-of-file-fixer"] = Builtins.newlines
+    ["check-merge-conflict"] = Builtins.check_merge_conflict
+    ["check-added-large-files"] = Builtins.check_added_large_files
+    ["check-case-conflict"] = Builtins.check_case_conflict
+    ["detect-private-key"] = Builtins.detect_private_key
+    ["check-executables-have-shebangs"] = Builtins.check_executables_have_shebangs
+    ["mixed-line-ending"] = Builtins.mixed_line_ending
+}
+
 hooks {
     ["pre-commit"] {
         fix = true
-        steps {
-            ["typecheck"] = (Builtins.tsc) {
-                check = "bunx tsc --noEmit -p {{workspace_indicator}}"
-            }
-            ["lint"] = Builtins.biome
-            ["markdown"] = Builtins.markdown_lint
-            ["actionlint"] = Builtins.actionlint
+        steps = (hygieneChecks) {
             ["aislop"] {
                 check = "aislop ci --staged"
             }
-            ["trailing-whitespace"] = Builtins.trailing_whitespace
-            ["end-of-file-fixer"] = Builtins.newlines
-            ["check-merge-conflict"] = Builtins.check_merge_conflict
-            ["check-added-large-files"] = Builtins.check_added_large_files
-            ["check-case-conflict"] = Builtins.check_case_conflict
-            ["detect-private-key"] = Builtins.detect_private_key
-            ["check-executables-have-shebangs"] = Builtins.check_executables_have_shebangs
-            ["mixed-line-ending"] = Builtins.mixed_line_ending
+        }
+    }
+    ["pre-push"] {
+        steps = (hygieneChecks) {
+            ["aislop"] {
+                check = "aislop ci"
+            }
         }
     }
 }
