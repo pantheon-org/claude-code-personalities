@@ -28,27 +28,3 @@ run = "bun run src/cli/switch.ts"
 [tasks."install:plugin"]
 description = "Seed personality data and the skill symlink for local dev"
 run = "node dist/install.mjs"
-
-[tasks.typecheck]
-description = "Type-check without emitting"
-run = "bunx tsc --noEmit"
-
-[tasks.lint]
-description = "Lint src/ with biome"
-run = "biome check src/"
-
-[tasks."lint:fix"]
-description = "Lint and auto-fix src/ with biome"
-run = "biome check --write src/"
-
-[tasks.format]
-description = "Format src/ with biome"
-run = "biome format --write src/"
-
-[tasks."lint:markdown"]
-description = "Lint markdown files with markdownlint"
-run = 'markdownlint "**/*.md"'
-
-[tasks."lint:markdown:fix"]
-description = "Lint and auto-fix markdown files with markdownlint"
-run = 'markdownlint --fix "**/*.md"'

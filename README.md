@@ -155,12 +155,10 @@ Tool versions (bun, node, hk, biome, markdownlint) are managed by [mise](https:/
 ```bash
 bun install                    # install JS dependencies
 mise run build                 # compile TypeScript → dist/ via Vite
-mise run typecheck             # type-check without emitting
-mise run lint                  # biome check
-mise run lint:fix              # biome check --write (auto-fix)
-mise run lint:markdown         # markdownlint check
-mise run lint:markdown:fix     # markdownlint --fix (auto-fix)
 mise run install:plugin        # seed personality data + skill symlink (first run only)
+bunx tsc --noEmit               # type-check without emitting
+biome check src/                # lint (add --write to auto-fix)
+markdownlint "**/*.md"          # lint markdown (add --fix to auto-fix)
 ```
 
 Source lives in `src/`, compiled output goes to `dist/` (gitignored locally; committed to `main` by the `bundle.yml` CI workflow).

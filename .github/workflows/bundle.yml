@@ -34,7 +34,7 @@ jobs:
 
       - run: bun install
 
-      - run: mise run typecheck
+      - run: bunx tsc --noEmit
 
       - run: mise run build
 
