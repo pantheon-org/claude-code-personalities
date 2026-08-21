@@ -1,0 +1,39 @@
+// Renovate configuration — automated dependency updates.
+// The Renovate GitHub App is already installed org-wide on pantheon-org, so
+// this file is all that's needed to activate it here.
+// Reference: https://docs.renovatebot.com/configuration-options/
+{
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  extends: ['config:recommended'],
+
+  // Weekly cadence: only open/update branches in a 4h window on Monday
+  // mornings, UK time. Cron syntax (not the deprecated "Later" syntax) per
+  // Renovate's own recommendation; a single instant isn't a valid window, so
+  // this gives it room in case the bot doesn't poll at exactly 06:00.
+  timezone: 'Europe/London',
+  schedule: ['* 6-9 * * 1'],
+
+  packageRules: [
+    {
+      description:
+        'Group every minor/patch update into one weekly PR and automerge it once CI is green. Excludes 0.x versions — SemVer allows breaking changes in any 0.x release, even patch/minor, so those fall through to the rule below instead.',
+      matchUpdateTypes: ['minor', 'patch'],
+      matchCurrentVersion: '!/^0\\./',
+      groupName: 'non-major dependencies',
+      automerge: true,
+      automergeType: 'pr',
+      // The repo already has "Allow auto-merge" enabled and only permits
+      // squash merges, so GitHub's native auto-merge (rather than Renovate
+      // polling and merging itself) is the right fit — it fires the moment
+      // required checks (ci, ai-hygiene, Plumber) go green.
+      platformAutomerge: true,
+    },
+    {
+      description:
+        'Major updates (and any 0.x minor/patch update) stay as their own PR — never grouped, never automerged — so the project owner reviews and merges manually.',
+      matchUpdateTypes: ['major'],
+      automerge: false,
+      reviewers: ['thoroc'],
+    },
+  ],
+}
