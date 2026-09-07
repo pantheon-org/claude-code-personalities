@@ -1,5 +1,6 @@
 import { access, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { personalitiesDir, stateFile } from "./paths.js";
 import {
 	type PersonalityConfig,
 	PersonalityConfigSchema,
@@ -7,12 +8,9 @@ import {
 	PersonalityStateSchema,
 } from "./types.js";
 
-const HOME = process.env.HOME ?? process.env.USERPROFILE ?? "~";
-
-export const PERSONALITIES_DIR =
-	process.env.CLAUDE_PLUGIN_DATA_DIR ??
-	join(HOME, ".config/claude/personalities/data");
-export const STATE_FILE = join(HOME, ".config/claude/personality-state.json");
+// Resolved once per module instance, from the single definition in paths.ts.
+export const PERSONALITIES_DIR = personalitiesDir();
+export const STATE_FILE = stateFile();
 
 async function fileExists(path: string): Promise<boolean> {
 	return access(path)

@@ -1,0 +1,75 @@
+{
+  "bender.json": [
+    "05617da4bda2779f4c387b3a0ae512aa38b2d112111cf7473038df034d2900e5",
+    "8a66b9ba9769a9ba4fd1dd7ab53c606a9171583743b90c70403dc85319333c7a"
+  ],
+  "bob-ross.json": [
+    "96f86c62b1d5a2e3cd11a044ce6279764838bc1e4c748556d7284d3aedc1f657"
+  ],
+  "data.json": [
+    "71793127cbfaa579324f9a03a83c7a2833ea36c7232343ed753a0196edaf670a",
+    "73076b4fae599e073367425da157d370a5fdde096b396e68043b255dfe1c713d"
+  ],
+  "deadpool.json": [
+    "2c6ad48862ca5c13548a50c05736112e9cb429ddff9aab54fa79dd5bbaf86479",
+    "dc301f9e36654ee31425c176b1011bbeea0525051b565977da4fe65e89babacb"
+  ],
+  "dumbledore.json": [
+    "4468025cf13b83c6502d6318fdd55f98faf0dc4e576563b38bc75ac0cd4792a6",
+    "859cd9305235a4b2ee1989a453bed31a12d5de9d022f8bd9cd331eeffd715b17"
+  ],
+  "example.json": [
+    "06586e83546dcd57a45a476593b07fccb764faf6bfa27bdca38e08d9755ee5d0"
+  ],
+  "gandalf.json": [
+    "cee71b8bac3141a958bc7dbbee2da249d0a38416d682651d237bdac9f48b19da",
+    "e1717597576c1a51d88cdd532fb278ae2c71a622f9a6f88d9aa9c4f51e51639f"
+  ],
+  "glados.json": [
+    "50125ef0e1ef7d2e4e1aaeb72e73655886fed6a1fe6e17726ad62a8c50f291d1",
+    "8aa49ccc9750a34a991ecb8d6a0a70688b0d38a97343ad827fa2aa26502ca1e6"
+  ],
+  "jack-sparrow.json": [
+    "7092a308fedb0a734b69c1d2c0bf3f90433b5abc3934bc8f6382245298c31e68"
+  ],
+  "paddington.json": [
+    "b97df9720f0eabd8e25d57c1cf1919cffd65ca001493626e5432d53939cd2c96"
+  ],
+  "q.json": [
+    "173b9d5b7fedf01fd832b7c3bc1fc954a15e915aa7446f1f49fa977478105e82",
+    "2b39b7b0e271b5f345bc28fcc531d3c89007cea2c75b89c7e8ef384758c4aa36"
+  ],
+  "rick.json": [
+    "1c60705559a9572c9109d04ffa85a54d33ca2613f4ed4fe64f9c3e654674d00c",
+    "9b9bdc9ec9c0d97a12c4c93629ae4d3a70de12e414422ad437361c04e006f9a2"
+  ],
+  "scott-adams.json": [
+    "79d60328b0eb6bf73d7d50c8c038f04d8dbc93c72d9d48466d732bcb4ff43d01"
+  ],
+  "sherlock.json": [
+    "27036aa02bd8d31385d549e2dc763b3fbf807f75e0b4994e04a90260a0603858",
+    "c65103308056a20bffcce6230275aa0bfa65643ecfe2f3ed95659bb4380c070e"
+  ],
+  "shrek.json": [
+    "82d3df309d668d21d8bac10b7e519037487077c5ebbe70c61f447a943e1b6a83"
+  ],
+  "splinter.json": [
+    "ac72dd033021f37a879ee2b403ef7f64db122311d42fdb01ce8bbcbec819ccf3",
+    "dd71e0c5427cef90adf61e0bcdafb2bd7e51e6a52082cfa783f1f5fa040e20a5"
+  ],
+  "spock.json": [
+    "106545d3026b2dfd01fbc64e943672a676e1a027fb661fbb1a8889e68ac3296c",
+    "fca1414ec21e6064211e4129a90ac96d91dd61c4c8261bfa8169f310651bfef2"
+  ],
+  "ted-lasso.json": [
+    "93a85c835a65f20a465df523d9cdbc22839fd475aea61ec1fec6e720f05aa9d9"
+  ],
+  "winnie-the-pooh.json": [
+    "1ef116dc8246da5527599e080cecad34aefc50e1232256596fee5aa5f3fefa92"
+  ],
+  "yoda.json": [
+    "34899ce2e247a56f077ad09134d1b26518e16b5e483741cba2ff2c74c2db0d65",
+    "6d2f7f915615d66e8440e71ed98ea57dd79812bc6d72b3d93a2f4f2336a5b68a",
+    "c6fa19cb2f27f0b1b3523addcac9bd5ded53a907925f99384b7c305684da486c"
+  ]
+}

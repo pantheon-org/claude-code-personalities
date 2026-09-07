@@ -47,3 +47,7 @@ run = "aislop ci"
 [tasks."slop:changes"]
 description = "Run the aislop quality gate over changed files (AISLOP_BASE, default HEAD)"
 run = "aislop ci --changes --base ${AISLOP_BASE:-HEAD}"
+
+[tasks."generate:hashes"]
+description = "Record the hash of every published version of each bundled personality"
+run = "bun run scripts/generate-shipped-hashes.ts"

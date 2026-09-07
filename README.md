@@ -40,7 +40,7 @@ The active personality persists across sessions. After switching, the new person
 
 ### Add your own
 
-Create a JSON file in `~/.config/claude/personalities/data/`. The filename (without `.json`) becomes the slug used with `/personality`.
+Create a JSON file in `~/.claude/personalities/data/` (or `$CLAUDE_CONFIG_DIR/personalities/data/` if you have set that variable). The filename (without `.json`) becomes the slug used with `/personality`.
 
 Here is a fully annotated example (`marvin.json`):
 
@@ -102,6 +102,29 @@ Here is a fully annotated example (`marvin.json`):
 
 > **Tip:** `jsonc` (JSON with comments) is shown above for documentation only. The actual file must be valid JSON — strip the comments before saving.
 
+### Where your data lives
+
+Everything hangs off Claude Code's config directory, which is `$CLAUDE_CONFIG_DIR` when you have set it and `~/.claude` otherwise.
+
+| Path | Holds |
+| ---- | ----- |
+| `<config>/personalities/data/*.json` | Your personality library, one file per personality |
+| `<config>/personality-state.json` | Which personality is currently active |
+| `<config>/personalities/seeded.json` | Bookkeeping: which files the installer placed, and their checksums |
+
+The installer treats your library as yours:
+
+- **New personalities arrive on upgrade.** Bundled files you do not have yet are added.
+- **Improvements to bundled personalities reach you.** If your copy is one the plugin shipped and you have not touched it, the installer refreshes it.
+- **Your edits are never overwritten.** A file you have changed is left exactly as it is. The run ends by naming anything it held back, so you know a newer version exists.
+- **Deleting one makes it stay deleted.** A personality you remove is not silently restored.
+
+Run `node dist/install.mjs --force` to re-copy every bundled file, overriding all of the above.
+
+It tells your files apart from its own by checksum rather than a version number, because a version says only that the bundle changed, not whether your copy is still the one it shipped. `schema/shipped-hashes.json` records every version of every personality this plugin has published, so even a library installed long before this bookkeeping existed can be told apart from one you have edited.
+
+If you installed a version before the config directory was unified, your data may still sit under `~/.config/claude/`. The installer moves it across the first time it runs against an empty library, active personality included.
+
 ## Installation
 
 ### Via Claude Code (recommended)
@@ -135,7 +158,7 @@ mise run install:plugin
 
 `mise run install:plugin` does two things:
 
-1. Seeds the bundled example personalities into `~/.config/claude/personalities/data/` if none exist yet.
+1. Seeds bundled personalities into `~/.claude/personalities/data/`, following the rules in [Where your data lives](#where-your-data-lives): new ones are added, unedited ones are refreshed, your edits and deletions are respected.
 
 2. Creates a `~/.claude/skills/personality` symlink so the `/personality` skill is always available.
 
@@ -190,4 +213,4 @@ The plugin is ready for publication to the Claude Code Plugin marketplace. All d
 - **`.claude-plugin/plugin.json`** — plugin manifest (name, version, description) ✓
 - **`dist/` built by CI** — a `bundle.yml` workflow builds and commits `dist/` to `main` on every source change; no manual build step required on install ✓
 - **Hooks via `hooks/hooks.json`** — `SessionStart` hook registers automatically using `${CLAUDE_PLUGIN_ROOT}`; no `settings.json` mutation ✓
-- **`CLAUDE_PLUGIN_DATA_DIR`** — personality data path reads from the Plugin-provided env var, falling back to `~/.config/claude/personalities/data` for local dev ✓
+- **`CLAUDE_PLUGIN_DATA_DIR`** — personality data path reads from the Plugin-provided env var, falling back to `$CLAUDE_CONFIG_DIR/personalities/data` (default `~/.claude/personalities/data`) for local dev ✓
