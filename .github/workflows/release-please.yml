@@ -41,11 +41,17 @@ jobs:
           release-type: node
           token: ${{ steps.token.outputs.token }}
 
+      # outputs.pr is the whole pull request as JSON, not its number. Pasting it
+      # into the command line put the generated changelog — parentheses, quotes
+      # and all — straight into the shell, so this step failed every time a
+      # release PR existed. Take the number, and pass it through the
+      # environment rather than interpolating it into the script.
       - name: Auto-merge Release PR
         if: ${{ steps.release.outputs.pr }}
         env:
           GH_TOKEN: ${{ steps.token.outputs.token }}
-        run: gh pr merge --auto --squash "${{ steps.release.outputs.pr }}" --repo ${{ github.repository }}
+          PR_NUMBER: ${{ fromJSON(steps.release.outputs.pr).number }}
+        run: gh pr merge --auto --squash "$PR_NUMBER" --repo "$GITHUB_REPOSITORY"
 
   build-and-upload:
     needs: release-please
