@@ -45,6 +45,8 @@ A Claude Code plugin: a `SessionStart` hook injects a character personality into
 | `src/lib/types.ts` | Zod schemas (`PersonalityConfigSchema`, `MoodSchema`, `PersonalityStateSchema`) — source of truth for `schema/personality.schema.json` |
 | `data/*.json` | Bundled personality definitions |
 | `schema/personality.schema.json` | Generated — run `mise run generate:schema` after editing `src/lib/types.ts`, never hand-edit |
+| `schema/shipped-hashes.json` | Generated, append-only — every hash ever published per personality; `mise run generate:hashes` (also run by `mise run build`). Never hand-edit or prune: removing an entry makes that version look like a user edit and stops the installer updating it |
+| `src/lib/paths.ts` | Single source of truth for every path the plugin reads or writes |
 | `hooks/hooks.json` | Plugin hook manifest, points at `${CLAUDE_PLUGIN_ROOT}/dist/hooks/inject.mjs` |
 | `.claude-plugin/plugin.json` | Plugin manifest (name, version, skills path) |
 | `dist/` | Build output. Gitignored locally; built and committed to `main` by CI (`bundle.yml`) — do not hand-edit or hand-commit it |

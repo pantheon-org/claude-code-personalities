@@ -110,13 +110,18 @@ Everything hangs off Claude Code's config directory, which is `$CLAUDE_CONFIG_DI
 | ---- | ----- |
 | `<config>/personalities/data/*.json` | Your personality library, one file per personality |
 | `<config>/personality-state.json` | Which personality is currently active |
-| `<config>/personalities/seeded.json` | Bookkeeping: which files the installer has placed |
+| `<config>/personalities/seeded.json` | Bookkeeping: which files the installer placed, and their checksums |
 
 The installer treats your library as yours:
 
 - **New personalities arrive on upgrade.** Bundled files you do not have yet are added.
-- **Your edits are never overwritten.** A file already in the directory is left exactly as it is, so customising a bundled personality is safe.
-- **Deleting one makes it stay deleted.** `seeded.json` records what the installer has already placed, so a personality you remove is not silently restored. Run `node dist/install.mjs --force` to re-copy every bundled file, including ones you removed.
+- **Improvements to bundled personalities reach you.** If your copy is one the plugin shipped and you have not touched it, the installer refreshes it.
+- **Your edits are never overwritten.** A file you have changed is left exactly as it is. The run ends by naming anything it held back, so you know a newer version exists.
+- **Deleting one makes it stay deleted.** A personality you remove is not silently restored.
+
+Run `node dist/install.mjs --force` to re-copy every bundled file, overriding all of the above.
+
+It tells your files apart from its own by checksum rather than a version number, because a version says only that the bundle changed, not whether your copy is still the one it shipped. `schema/shipped-hashes.json` records every version of every personality this plugin has published, so even a library installed long before this bookkeeping existed can be told apart from one you have edited.
 
 If you installed a version before the config directory was unified, your data may still sit under `~/.config/claude/`. The installer moves it across the first time it runs against an empty library, active personality included.
 
@@ -153,7 +158,7 @@ mise run install:plugin
 
 `mise run install:plugin` does two things:
 
-1. Seeds bundled personalities into `~/.claude/personalities/data/`. Files already there are never overwritten, so local edits survive an upgrade, and a personality you delete is not restored on the next run. Pass `--force` to re-copy every bundled file, including ones you removed.
+1. Seeds bundled personalities into `~/.claude/personalities/data/`, following the rules in [Where your data lives](#where-your-data-lives): new ones are added, unedited ones are refreshed, your edits and deletions are respected.
 
 2. Creates a `~/.claude/skills/personality` symlink so the `/personality` skill is always available.
 
