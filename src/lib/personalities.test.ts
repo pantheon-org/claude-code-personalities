@@ -13,8 +13,8 @@ beforeEach(async () => {
 	dataDir = join(tmpRoot, "data");
 	homeDir = join(tmpRoot, "home");
 	// saveState() does not create its parent directory itself, so the state
-	// file's parent must already exist — matches a real ~/.config/claude.
-	mkdirSync(join(homeDir, ".config/claude"), { recursive: true });
+	// file's parent must already exist — matches a real ~/.claude.
+	mkdirSync(join(homeDir, ".claude"), { recursive: true });
 	process.env.CLAUDE_PLUGIN_DATA_DIR = dataDir;
 	process.env.HOME = homeDir;
 	// Force a fresh module instance so PERSONALITIES_DIR/STATE_FILE are
@@ -62,8 +62,8 @@ describe("loadState / saveState", () => {
 
 	test("saveState rejects when its parent config directory does not exist", async () => {
 		// Known fragility: saveState() never creates STATE_FILE's parent dir,
-		// so a $HOME without a pre-existing ~/.config/claude makes this throw.
-		rmSync(join(homeDir, ".config"), { recursive: true, force: true });
+		// so a $HOME without a pre-existing ~/.claude makes this throw.
+		rmSync(join(homeDir, ".claude"), { recursive: true, force: true });
 		await expect(personalities.saveState("bender")).rejects.toThrow();
 	});
 });

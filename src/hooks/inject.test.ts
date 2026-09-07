@@ -38,7 +38,7 @@ function setUp() {
 	// saveState() requires its parent dir to pre-exist — see
 	// personalities.test.ts's "saveState rejects when its parent config
 	// directory does not exist" for the fragility this works around.
-	mkdirSync(join(homeDir, ".config/claude"), { recursive: true });
+	mkdirSync(join(homeDir, ".claude"), { recursive: true });
 	return { tmpRoot, dataDir, homeDir };
 }
 
@@ -73,10 +73,7 @@ describe("inject hook", () => {
 			);
 
 			const state = JSON.parse(
-				readFileSync(
-					join(homeDir, ".config/claude/personality-state.json"),
-					"utf8",
-				),
+				readFileSync(join(homeDir, ".claude/personality-state.json"), "utf8"),
 			);
 			expect(state.current).toBe("solo");
 		} finally {
@@ -92,9 +89,9 @@ describe("inject hook", () => {
 				join(dataDir, "solo.json"),
 				JSON.stringify({ description: "The only option." }),
 			);
-			mkdirSync(join(homeDir, ".config/claude"), { recursive: true });
+			mkdirSync(join(homeDir, ".claude"), { recursive: true });
 			writeFileSync(
-				join(homeDir, ".config/claude/personality-state.json"),
+				join(homeDir, ".claude/personality-state.json"),
 				JSON.stringify({ current: "ghost" }),
 			);
 
@@ -122,9 +119,9 @@ describe("inject hook", () => {
 				join(dataDir, "b.json"),
 				JSON.stringify({ description: "Personality B." }),
 			);
-			mkdirSync(join(homeDir, ".config/claude"), { recursive: true });
+			mkdirSync(join(homeDir, ".claude"), { recursive: true });
 			writeFileSync(
-				join(homeDir, ".config/claude/personality-state.json"),
+				join(homeDir, ".claude/personality-state.json"),
 				JSON.stringify({ current: "b" }),
 			);
 

@@ -7,7 +7,9 @@ describe("contants", () => {
 		expect(CLAUDE_CODE_CONFIG_FILE).toBe("settings.json");
 	});
 
-	test("CLAUDE_CODE_CONFIG_DIR is under the user's home directory", () => {
-		expect(CLAUDE_CODE_CONFIG_DIR).toBe(`${homedir()}/.claude`);
+	test("CLAUDE_CODE_CONFIG_DIR falls back to ~/.claude", () => {
+		const home = process.env.HOME ?? process.env.USERPROFILE ?? homedir();
+		const expected = process.env.CLAUDE_CONFIG_DIR ?? `${home}/.claude`;
+		expect(CLAUDE_CODE_CONFIG_DIR).toBe(expected);
 	});
 });

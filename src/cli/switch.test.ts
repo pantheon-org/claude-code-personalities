@@ -39,7 +39,7 @@ function setUp() {
 	// saveState() requires its parent dir to pre-exist — see
 	// personalities.test.ts's "saveState rejects when its parent config
 	// directory does not exist" for the fragility this works around.
-	mkdirSync(join(homeDir, ".config/claude"), { recursive: true });
+	mkdirSync(join(homeDir, ".claude"), { recursive: true });
 	return { tmpRoot, dataDir, homeDir };
 }
 
@@ -68,9 +68,9 @@ describe("switch CLI", () => {
 				join(dataDir, "yoda.json"),
 				JSON.stringify({ name: "Yoda", description: "x" }),
 			);
-			mkdirSync(join(homeDir, ".config/claude"), { recursive: true });
+			mkdirSync(join(homeDir, ".claude"), { recursive: true });
 			writeFileSync(
-				join(homeDir, ".config/claude/personality-state.json"),
+				join(homeDir, ".claude/personality-state.json"),
 				JSON.stringify({ current: "bender" }),
 			);
 
@@ -100,10 +100,7 @@ describe("switch CLI", () => {
 			expect(stdout).toContain("Yoda");
 
 			const state = JSON.parse(
-				readFileSync(
-					join(homeDir, ".config/claude/personality-state.json"),
-					"utf8",
-				),
+				readFileSync(join(homeDir, ".claude/personality-state.json"), "utf8"),
 			);
 			expect(state.current).toBe("yoda");
 		} finally {
@@ -124,10 +121,7 @@ describe("switch CLI", () => {
 			expect(exitCode).toBe(0);
 
 			const state = JSON.parse(
-				readFileSync(
-					join(homeDir, ".config/claude/personality-state.json"),
-					"utf8",
-				),
+				readFileSync(join(homeDir, ".claude/personality-state.json"), "utf8"),
 			);
 			expect(state.current).toBe("yoda");
 		} finally {
