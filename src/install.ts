@@ -30,7 +30,9 @@ import {
 
 const PLUGIN_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const BUNDLED_DIR = join(PLUGIN_DIR, "data");
-const HASHES_FILE = join(PLUGIN_DIR, "schema", "shipped-hashes.json");
+const HASHES_FILE =
+	process.env.CLAUDE_PLUGIN_HASHES_FILE ??
+	join(PLUGIN_DIR, "schema", "shipped-hashes.json");
 const force = process.argv.includes("--force");
 
 const DATA_DIR = personalitiesDir();

@@ -1,5 +1,4 @@
 import { describe, expect, test } from "bun:test";
-import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import {
 	mkdirSync,
@@ -60,17 +59,6 @@ function withTmp(fn: (root: string) => Promise<void>) {
 			rmSync(root, { recursive: true, force: true });
 		}
 	};
-}
-
-function gitShow(ref: string): string | null {
-	try {
-		return execFileSync("git", ["show", ref], {
-			cwd: REPO_ROOT,
-			encoding: "utf8",
-		});
-	} catch {
-		return null;
-	}
 }
 
 const dataDirOf = (root: string) => join(root, "personalities/data");
@@ -278,43 +266,66 @@ describe("install script", () => {
 	test(
 		"recognises an old published version as ours via the shipped-hash manifest",
 		withTmp(async (root) => {
-			// A file whose bundled content has actually changed since an earlier
-			// release, so "left alone" and "updated" are distinguishable.
-			const revisions = execFileSync(
-				"git",
-				["rev-list", "HEAD", "--", "data"],
-				{ cwd: REPO_ROOT, encoding: "utf8" },
-			)
-				.trim()
-				.split("\n")
-				.filter(Boolean);
-
-			let target: { file: string; older: string } | null = null;
-			for (const file of BUNDLED) {
-				const current = readFileSync(join(REPO_ROOT, "data", file), "utf8");
-				for (const rev of revisions) {
-					const older = gitShow(`${rev}:data/${file}`);
-					if (older && older !== current) {
-						target = { file, older };
-						break;
-					}
-				}
-				if (target) break;
-			}
-			expect(target).not.toBeNull();
-			const { file, older } = target as { file: string; older: string };
+			// Deliberately git-free: ci.yml checks out shallow, so a test that read
+			// history here would pass locally and fail in CI.
+			const legacy = '{"description":"an earlier published rick"}';
+			const manifest = join(root, "hashes.json");
+			writeFileSync(
+				manifest,
+				JSON.stringify({
+					"rick.json": [
+						createHash("sha256").update(legacy, "utf8").digest("hex"),
+					],
+				}),
+			);
 
 			// No ledger at all, as on an install predating it: the manifest is the
 			// only evidence this file is one we shipped rather than the user's.
 			mkdirSync(dataDirOf(root), { recursive: true });
-			writeFileSync(join(dataDirOf(root), file), older);
+			writeFileSync(join(dataDirOf(root), "rick.json"), legacy);
 
-			const { stdout } = await runInstall(root);
+			const env = envFor(root);
+			env.CLAUDE_PLUGIN_HASHES_FILE = manifest;
+			const proc = Bun.spawn(["bun", "run", "src/install.ts"], {
+				cwd: REPO_ROOT,
+				env,
+				stdout: "pipe",
+				stderr: "pipe",
+			});
+			const stdout = await new Response(proc.stdout).text();
+			await proc.exited;
 
-			expect(stdout).toContain("Updated");
-			expect(stdout).toContain(file.replace(/\.json$/, ""));
-			expect(readFileSync(join(dataDirOf(root), file), "utf8")).toBe(
-				readFileSync(join(REPO_ROOT, "data", file), "utf8"),
+			expect(stdout).toContain(
+				"Updated 1 unmodified personality file(s): rick",
+			);
+			expect(readFileSync(join(dataDirOf(root), "rick.json"), "utf8")).toBe(
+				readFileSync(join(REPO_ROOT, "data/rick.json"), "utf8"),
+			);
+		}),
+	);
+
+	test(
+		"leaves a file alone when no manifest entry vouches for it",
+		withTmp(async (root) => {
+			const manifest = join(root, "hashes.json");
+			writeFileSync(manifest, JSON.stringify({}));
+			mkdirSync(dataDirOf(root), { recursive: true });
+			writeFileSync(join(dataDirOf(root), "rick.json"), '{"description":"x"}');
+
+			const env = envFor(root);
+			env.CLAUDE_PLUGIN_HASHES_FILE = manifest;
+			const proc = Bun.spawn(["bun", "run", "src/install.ts"], {
+				cwd: REPO_ROOT,
+				env,
+				stdout: "pipe",
+				stderr: "pipe",
+			});
+			const stdout = await new Response(proc.stdout).text();
+			await proc.exited;
+
+			expect(stdout).toContain("Kept your edited version of: rick");
+			expect(readFileSync(join(dataDirOf(root), "rick.json"), "utf8")).toBe(
+				'{"description":"x"}',
 			);
 		}),
 	);
