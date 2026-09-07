@@ -41,27 +41,49 @@ jobs:
           release-type: node
           token: ${{ steps.token.outputs.token }}
 
-      # outputs.pr is the whole pull request as JSON, not its number. Pasting it
-      # into the command line put the generated changelog — parentheses, quotes
-      # and all — straight into the shell, so this step failed every time a
-      # release PR existed. Take the number, and pass it through the
-      # environment rather than interpolating it into the script.
+      # outputs.pr is the whole pull request as JSON, not its number, and it is
+      # empty on runs with nothing to release. It is passed through the
+      # environment as raw JSON and parsed here: interpolating it into the
+      # script put the generated changelog on the command line, and calling
+      # fromJSON() on it broke the workflow template whenever it was empty.
       - name: Merge Release PR
         if: ${{ steps.release.outputs.pr }}
+        timeout-minutes: 30
         env:
           GH_TOKEN: ${{ steps.token.outputs.token }}
-          PR_NUMBER: ${{ fromJSON(steps.release.outputs.pr).number }}
+          PR_JSON: ${{ steps.release.outputs.pr }}
         run: |
-          # Auto-merge means "merge once the required checks pass", so GitHub
-          # only accepts it when the base branch has protection rules to supply
-          # those checks. main is currently unprotected, so the API refuses the
-          # request and there is nothing to wait for anyway. Attempt it first,
-          # so protecting the branch later restores the safer behaviour with no
-          # further change here, and merge directly when it is unavailable.
+          PR_NUMBER=$(jq -r '.number' <<<"$PR_JSON")
+          echo "Release PR is #$PR_NUMBER"
+
+          # Checks are registered a moment after the PR head moves. Without this
+          # wait, an empty result reads as "nothing failed" and the release
+          # merges before its pipeline has even started. gh exits 8 when a pull
+          # request has no checks reported yet.
+          for _ in $(seq 1 12); do
+            rc=0
+            gh pr checks "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || rc=$?
+            if [ "$rc" -ne 8 ]; then
+              break
+            fi
+            echo "Waiting for checks to register on #$PR_NUMBER..."
+            sleep 10
+          done
+
+          # main is unprotected, so GitHub will not gate this merge for us.
+          # Gate it here instead: a release must never ship on a red pipeline.
+          if ! gh pr checks "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --watch --fail-fast --interval 15; then
+            echo "::error::Release PR #$PR_NUMBER has failing checks. Not merging."
+            exit 1
+          fi
+
+          # Auto-merge needs branch protection to supply the checks it waits on,
+          # so it is refused here today. Attempt it anyway, so protecting main
+          # later hands the gating back to GitHub with no change to this file.
           if gh pr merge --auto --squash "$PR_NUMBER" --repo "$GITHUB_REPOSITORY"; then
             echo "Queued auto-merge for #$PR_NUMBER."
           else
-            echo "Auto-merge unavailable (see error above); merging #$PR_NUMBER now."
+            echo "Auto-merge unavailable; merging #$PR_NUMBER now that its checks are green."
             gh pr merge --squash "$PR_NUMBER" --repo "$GITHUB_REPOSITORY"
           fi
 
