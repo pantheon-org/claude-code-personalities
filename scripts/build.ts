@@ -2,6 +2,7 @@ import { build } from "vite";
 import { execSync } from "node:child_process";
 
 execSync("bun run scripts/generate-schema.ts", { stdio: "inherit" });
+execSync("bun run scripts/generate-shipped-hashes.ts", { stdio: "inherit" });
 
 const shared = {
 	build: {

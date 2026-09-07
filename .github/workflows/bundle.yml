@@ -29,6 +29,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           token: ${{ steps.token.outputs.token }}
+          # shipped-hashes.json is regenerated from the history of data/, so a
+          # shallow clone would rebuild it with only the tip commit's hashes.
+          fetch-depth: 0
 
       - uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
         with:
@@ -56,7 +59,7 @@ jobs:
         run: |
           git config user.name "pantheon-org-bot[bot]"
           git config user.email "pantheon-org-bot[bot]@users.noreply.github.com"
-          git add -f dist/hooks/inject.mjs dist/cli/switch.mjs dist/install.mjs
+          git add -f dist/hooks/inject.mjs dist/cli/switch.mjs dist/install.mjs schema/shipped-hashes.json
           git diff --staged --quiet && echo "No changes" && exit 0
           git commit -m "ci: update dist bundles"
           git push

@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test";
+import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
 	mkdirSync,
 	mkdtempSync,
@@ -60,6 +62,17 @@ function withTmp(fn: (root: string) => Promise<void>) {
 	};
 }
 
+function gitShow(ref: string): string | null {
+	try {
+		return execFileSync("git", ["show", ref], {
+			cwd: REPO_ROOT,
+			encoding: "utf8",
+		});
+	} catch {
+		return null;
+	}
+}
+
 const dataDirOf = (root: string) => join(root, "personalities/data");
 const ledgerOf = (root: string) => join(root, "personalities/seeded.json");
 const listData = (root: string) =>
@@ -115,7 +128,7 @@ describe("install script", () => {
 			const { stdout, exitCode } = await runInstall(root);
 			expect(exitCode).toBe(0);
 			expect(listData(root)).toEqual(BUNDLED);
-			expect(stdout).toContain("Seeded");
+			expect(stdout).toContain("Added");
 		}),
 	);
 
@@ -164,7 +177,11 @@ describe("install script", () => {
 		withTmp(async (root) => {
 			await runInstall(root);
 			const ledger = JSON.parse(readFileSync(ledgerOf(root), "utf8"));
-			expect(ledger.seeded.sort()).toEqual(BUNDLED);
+			expect(Object.keys(ledger.files).sort()).toEqual(BUNDLED);
+			// Each entry carries the hash of the file the installer wrote.
+			for (const hash of Object.values(ledger.files)) {
+				expect(hash).toMatch(/^[0-9a-f]{64}$/);
+			}
 		}),
 	);
 
@@ -227,6 +244,131 @@ describe("install script", () => {
 					.filter((f) => f.endsWith(".json"))
 					.sort(),
 			).toEqual(BUNDLED);
+		}),
+	);
+
+	test(
+		"updates a bundled personality the user has not touched",
+		withTmp(async (root) => {
+			await runInstall(root);
+			// Roll one file back to an older published version, as an existing
+			// install would have it after the bundled copy was revised.
+			const target = join(dataDirOf(root), "rick.json");
+			const shipped = JSON.parse(
+				readFileSync(join(REPO_ROOT, "schema/shipped-hashes.json"), "utf8"),
+			);
+			expect(shipped["rick.json"].length).toBeGreaterThan(0);
+			writeFileSync(target, '{"description":"stale"}');
+			const ledger = JSON.parse(readFileSync(ledgerOf(root), "utf8"));
+			// The ledger still holds the hash we wrote, so this counts as ours.
+			ledger.files["rick.json"] = createHash("sha256")
+				.update('{"description":"stale"}', "utf8")
+				.digest("hex");
+			writeFileSync(ledgerOf(root), JSON.stringify(ledger));
+
+			const { stdout } = await runInstall(root);
+
+			expect(stdout).toContain("Updated");
+			expect(readFileSync(target, "utf8")).toBe(
+				readFileSync(join(REPO_ROOT, "data/rick.json"), "utf8"),
+			);
+		}),
+	);
+
+	test(
+		"recognises an old published version as ours via the shipped-hash manifest",
+		withTmp(async (root) => {
+			// A file whose bundled content has actually changed since an earlier
+			// release, so "left alone" and "updated" are distinguishable.
+			const revisions = execFileSync(
+				"git",
+				["rev-list", "HEAD", "--", "data"],
+				{ cwd: REPO_ROOT, encoding: "utf8" },
+			)
+				.trim()
+				.split("\n")
+				.filter(Boolean);
+
+			let target: { file: string; older: string } | null = null;
+			for (const file of BUNDLED) {
+				const current = readFileSync(join(REPO_ROOT, "data", file), "utf8");
+				for (const rev of revisions) {
+					const older = gitShow(`${rev}:data/${file}`);
+					if (older && older !== current) {
+						target = { file, older };
+						break;
+					}
+				}
+				if (target) break;
+			}
+			expect(target).not.toBeNull();
+			const { file, older } = target as { file: string; older: string };
+
+			// No ledger at all, as on an install predating it: the manifest is the
+			// only evidence this file is one we shipped rather than the user's.
+			mkdirSync(dataDirOf(root), { recursive: true });
+			writeFileSync(join(dataDirOf(root), file), older);
+
+			const { stdout } = await runInstall(root);
+
+			expect(stdout).toContain("Updated");
+			expect(stdout).toContain(file.replace(/\.json$/, ""));
+			expect(readFileSync(join(dataDirOf(root), file), "utf8")).toBe(
+				readFileSync(join(REPO_ROOT, "data", file), "utf8"),
+			);
+		}),
+	);
+
+	test(
+		"reports an edited file instead of silently skipping it",
+		withTmp(async (root) => {
+			await runInstall(root);
+			writeFileSync(
+				join(dataDirOf(root), "rick.json"),
+				'{"description":"mine, hands off"}',
+			);
+
+			const { stdout } = await runInstall(root);
+
+			expect(stdout).toContain("Kept your edited version of: rick");
+			expect(readFileSync(join(dataDirOf(root), "rick.json"), "utf8")).toBe(
+				'{"description":"mine, hands off"}',
+			);
+		}),
+	);
+
+	test(
+		"--force overwrites an edited file",
+		withTmp(async (root) => {
+			await runInstall(root);
+			writeFileSync(
+				join(dataDirOf(root), "rick.json"),
+				'{"description":"mine"}',
+			);
+
+			await runInstall(root, ["--force"]);
+
+			expect(readFileSync(join(dataDirOf(root), "rick.json"), "utf8")).toBe(
+				readFileSync(join(REPO_ROOT, "data/rick.json"), "utf8"),
+			);
+		}),
+	);
+
+	test(
+		"upgrades a name-only ledger from an earlier release",
+		withTmp(async (root) => {
+			await runInstall(root);
+			rmSync(join(dataDirOf(root), "rick.json"));
+			// The v1 ledger shape: names, no hashes.
+			writeFileSync(ledgerOf(root), JSON.stringify({ seeded: ["rick.json"] }));
+
+			const { stdout } = await runInstall(root);
+
+			// A deletion recorded in the old format is still honoured.
+			expect(listData(root)).not.toContain("rick.json");
+			expect(stdout).toContain("previously removed");
+			const ledger = JSON.parse(readFileSync(ledgerOf(root), "utf8"));
+			expect(ledger.version).toBe(2);
 		}),
 	);
 
