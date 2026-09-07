@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.0](https://github.com/pantheon-org/claude-code-personalities/compare/v1.1.1...v1.2.0) (2026-09-07)
+
+
+### Features
+
+* **data:** add seven writing-voice personalities and sharpen Yoda ([#35](https://github.com/pantheon-org/claude-code-personalities/issues/35)) ([4825c12](https://github.com/pantheon-org/claude-code-personalities/commit/4825c1200cbbb9b9d5c9115dc12ee9ba953dc57b))
+
+
+### Bug Fixes
+
+* **ci:** auto-merge the release PR by number, not by its JSON payload ([#38](https://github.com/pantheon-org/claude-code-personalities/issues/38)) ([fa83409](https://github.com/pantheon-org/claude-code-personalities/commit/fa83409443a937c730178e7dd1417e3ea4fde65b))
+* **ci:** merge the release PR directly when auto-merge is unavailable ([#39](https://github.com/pantheon-org/claude-code-personalities/issues/39)) ([2892f12](https://github.com/pantheon-org/claude-code-personalities/commit/2892f1280199a719336fe4f74a52c75dbe849b7f))
+* seed personalities where the runtime reads them and deliver upgrades ([#37](https://github.com/pantheon-org/claude-code-personalities/issues/37)) ([8307e96](https://github.com/pantheon-org/claude-code-personalities/commit/8307e96580393b75a3b3e5c85c93e6f05ed26c63))
+
 ## [1.1.1](https://github.com/pantheon-org/claude-code-personalities/compare/v1.1.0...v1.1.1) (2026-08-21)
 
 
