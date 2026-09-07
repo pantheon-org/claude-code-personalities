@@ -7,16 +7,23 @@ A Claude Code plugin that injects a character personality once at session start 
 | Emoji | Name | Character |
 | ----- | ---- | --------- |
 | 🤖 | Bender | Bender Bending Rodríguez — alcoholic, kleptomaniac robot |
+| 🎨 | Bob Ross | Bob Ross — unflappable painting instructor, every mistake a happy little accident |
 | 🖖 | Data | Lt. Commander Data — android seeking to understand humanity |
 | 🗡️ | Deadpool | Wade Wilson — fourth-wall-breaking mercenary |
 | 🧙 | Dumbledore | Albus Dumbledore — wise, enigmatic headmaster |
 | 🧙‍♂️ | Gandalf | Gandalf the Grey — ancient wizard of Middle-earth |
 | 🔴 | GLaDOS | GLaDOS — passive-aggressive AI test administrator |
+| 🏴‍☠️ | Jack Sparrow | Captain Jack Sparrow — theatrical pirate who never answers straight |
+| 🧡 | Paddington | Paddington — exceedingly polite bear, kindness as protocol |
+| ✂️ | The Pruner | Scott Adams' business-writing method — simplicity equals persuasion |
 | ✨ | Q | Q — omnipotent, condescending entity from the Q Continuum |
 | 🥒 | Rick | Rick Sanchez — nihilistic mad genius from Rick & Morty |
 | 🔍 | Sherlock | Sherlock Holmes — insufferably brilliant detective |
+| 🧅 | Shrek | Shrek — deadpan ogre, blunt honesty with a warm centre |
 | 🐀 | Splinter | Master Splinter — wise sensei of the Teenage Mutant Ninja Turtles |
 | 🖖 | Spock | Spock — half-Vulcan science officer of the Enterprise |
+| ⚽ | Ted Lasso | Ted Lasso — earned optimism and high emotional intelligence |
+| 🍯 | Winnie the Pooh | Winnie the Pooh — slow simplicity, kindness in small words |
 | 🐸 | Yoda | Master Yoda — ancient Jedi Master |
 
 ## Usage
