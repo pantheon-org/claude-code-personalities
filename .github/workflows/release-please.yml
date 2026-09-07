@@ -46,12 +46,24 @@ jobs:
       # and all — straight into the shell, so this step failed every time a
       # release PR existed. Take the number, and pass it through the
       # environment rather than interpolating it into the script.
-      - name: Auto-merge Release PR
+      - name: Merge Release PR
         if: ${{ steps.release.outputs.pr }}
         env:
           GH_TOKEN: ${{ steps.token.outputs.token }}
           PR_NUMBER: ${{ fromJSON(steps.release.outputs.pr).number }}
-        run: gh pr merge --auto --squash "$PR_NUMBER" --repo "$GITHUB_REPOSITORY"
+        run: |
+          # Auto-merge means "merge once the required checks pass", so GitHub
+          # only accepts it when the base branch has protection rules to supply
+          # those checks. main is currently unprotected, so the API refuses the
+          # request and there is nothing to wait for anyway. Attempt it first,
+          # so protecting the branch later restores the safer behaviour with no
+          # further change here, and merge directly when it is unavailable.
+          if gh pr merge --auto --squash "$PR_NUMBER" --repo "$GITHUB_REPOSITORY"; then
+            echo "Queued auto-merge for #$PR_NUMBER."
+          else
+            echo "Auto-merge unavailable (see error above); merging #$PR_NUMBER now."
+            gh pr merge --squash "$PR_NUMBER" --repo "$GITHUB_REPOSITORY"
+          fi
 
   build-and-upload:
     needs: release-please
