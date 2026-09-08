@@ -55,10 +55,16 @@ jobs:
 
       - run: mise run build
 
+      # Identity comes from the token step rather than a hardcoded name: the
+      # literal that used to sit here ("pantheon-org-bot[bot]") did not match
+      # the app actually pushing, which made these commits hard to trace back
+      # to the app that produced them.
       - name: Commit dist
+        env:
+          APP_SLUG: ${{ steps.token.outputs.app-slug }}
         run: |
-          git config user.name "pantheon-org-bot[bot]"
-          git config user.email "pantheon-org-bot[bot]@users.noreply.github.com"
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${APP_SLUG}[bot]@users.noreply.github.com"
           git add -f dist/hooks/inject.mjs dist/cli/switch.mjs dist/install.mjs schema/shipped-hashes.json
           git diff --staged --quiet && echo "No changes" && exit 0
           git commit -m "ci: update dist bundles"
