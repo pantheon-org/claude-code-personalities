@@ -9,7 +9,13 @@ skills-lock.json
 .claude/skills/
 !.agents/
 .agents/skills/
-.aislop/
+# aislop writes both committed config and generated state here. The directory is
+# un-ignored first because a machine-wide ~/.gitignore excludes it, and git will
+# not descend into an excluded directory to re-include anything inside it.
+!.aislop/
+.aislop/*
+!.aislop/config.yml
+!.aislop/rules.yml
 hk.local.pkl
 !mise.toml
 !AGENTS.md
