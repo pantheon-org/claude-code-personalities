@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/pantheon-org/claude-code-personalities/compare/v1.2.0...v1.2.1) (2026-09-08)
+
+
+### Bug Fixes
+
+* **ci:** wait for the release PR's checks before merging it ([#40](https://github.com/pantheon-org/claude-code-personalities/issues/40)) ([0718392](https://github.com/pantheon-org/claude-code-personalities/commit/0718392f7d3c6c56636f633a00e3976d38e58967))
+
 ## [1.2.0](https://github.com/pantheon-org/claude-code-personalities/compare/v1.1.1...v1.2.0) (2026-09-07)
 
 
