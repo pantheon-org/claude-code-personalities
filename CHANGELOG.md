@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.2](https://github.com/pantheon-org/claude-code-personalities/compare/v1.2.1...v1.2.2) (2026-09-08)
+
+
+### Bug Fixes
+
+* **ci:** actually wait for the release PR's checks to register ([#45](https://github.com/pantheon-org/claude-code-personalities/issues/45)) ([f1234db](https://github.com/pantheon-org/claude-code-personalities/commit/f1234dba85a02ba0b033a398946ac88ada2c6c9c))
+* **ci:** take the dist commit identity from the app that pushes it ([#43](https://github.com/pantheon-org/claude-code-personalities/issues/43)) ([cf63c26](https://github.com/pantheon-org/claude-code-personalities/commit/cf63c268d3adf1454691191878f561be21f30233))
+
 ## [1.2.1](https://github.com/pantheon-org/claude-code-personalities/compare/v1.2.0...v1.2.1) (2026-09-08)
 
 
