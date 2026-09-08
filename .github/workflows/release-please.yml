@@ -56,18 +56,25 @@ jobs:
           PR_NUMBER=$(jq -r '.number' <<<"$PR_JSON")
           echo "Release PR is #$PR_NUMBER"
 
-          # Checks are registered a moment after the PR head moves. Without this
-          # wait, an empty result reads as "nothing failed" and the release
-          # merges before its pipeline has even started. gh exits 8 when a pull
-          # request has no checks reported yet.
-          for _ in $(seq 1 12); do
-            rc=0
-            gh pr checks "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || rc=$?
-            if [ "$rc" -ne 8 ]; then
-              break
-            fi
-            echo "Waiting for checks to register on #$PR_NUMBER..."
-            sleep 10
+          # Checks appear a few seconds after release-please pushes the branch,
+          # and this step starts within a second of that. Wait for them to
+          # register, keyed on the message gh actually prints, so "none yet" is
+          # never read as "none failing". Failing closed here is deliberate: if
+          # checks never arrive, the release does not go out unattended.
+          deadline=$(( SECONDS + 300 ))
+          while :; do
+            checks=$(gh pr checks "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" 2>&1) || true
+            case "$checks" in
+              *"no checks reported"*)
+                if [ "$SECONDS" -ge "$deadline" ]; then
+                  echo "::error::No checks registered on #$PR_NUMBER within 5 minutes. Not merging."
+                  exit 1
+                fi
+                echo "Waiting for checks to register on #$PR_NUMBER..."
+                sleep 10
+                ;;
+              *) break ;;
+            esac
           done
 
           # main is unprotected, so GitHub will not gate this merge for us.
