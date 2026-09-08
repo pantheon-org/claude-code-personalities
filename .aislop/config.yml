@@ -1,0 +1,9 @@
+# Biome owns formatting in this repo. biome.json is the single source of truth,
+# enforced by the pre-commit hook and by the `check` CI job.
+#
+# aislop runs its own bundled Biome with different defaults (a wider line
+# width), so with this rule on, the two tools reformatted the same five files in
+# opposite directions: satisfying one always broke the other. Formatting is
+# delegated to the project's Biome; every other aislop engine stays on.
+rules:
+  formatting: "off"
