@@ -3,7 +3,10 @@
 # Manages automated releases on merge to main.
 # - Opens/updates a Release PR that bumps package.json version and generates CHANGELOG.md
 # - When the Release PR is merged, creates a GitHub Release with a git tag
-# - On release creation, builds and uploads dist/ as release assets
+#
+# dist/ is not attached to releases: it is committed to main by bundle.yml, and
+# that is where the plugin installs from. Releases here are immutable, so assets
+# cannot be added after publication and the upload could never have worked.
 
 name: Release Please
 
@@ -24,10 +27,6 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-      tag_name: ${{ steps.release.outputs.tag_name }}
-      upload_url: ${{ steps.release.outputs.upload_url }}
     steps:
       - uses: actions/create-github-app-token@v1
         id: token
@@ -93,50 +92,3 @@ jobs:
             echo "Auto-merge unavailable; merging #$PR_NUMBER now that its checks are green."
             gh pr merge --squash "$PR_NUMBER" --repo "$GITHUB_REPOSITORY"
           fi
-
-  build-and-upload:
-    needs: release-please
-    if: ${{ needs.release-please.outputs.release_created }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/create-github-app-token@v1
-        id: token
-        with:
-          app-id: ${{ vars.GH_APP_ID }}
-          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
-
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.release-please.outputs.tag_name }}
-
-      - uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
-        with:
-          # Bust the action's install cache: a prior run cached a failed
-          # aislop/ctxharness install, and the cache key doesn't change just
-          # because mise.toml's *contents* are unchanged, so it kept
-          # restoring the same broken state on every retry.
-          cache_key_prefix: mise-v2-ctxharness
-        env:
-          # mise's default npm backend (aube) refuses to install a
-          # low-weekly-download package non-interactively in CI
-          # (npm:ctxharness) rather than prompting; there's no `--allow-low-
-          # downloads` passthrough, so fall back to shelling out to real npm
-          # instead of aube's vetting-heavy resolver.
-          MISE_YES: "1"
-          MISE_NPM_SHELL_OUT: "1"
-
-      - run: bun install
-
-      - run: mise run build
-
-      - name: Upload dist as release assets
-        env:
-          GH_TOKEN: ${{ steps.token.outputs.token }}
-        run: |
-          gh release upload "${{ needs.release-please.outputs.tag_name }}" \
-            dist/hooks/inject.mjs \
-            dist/cli/switch.mjs \
-            dist/install.mjs \
-            --repo ${{ github.repository }}
